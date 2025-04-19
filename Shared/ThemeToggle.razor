@@ -1,0 +1,46 @@
+﻿<div class="theme-toggle">
+    <button class="btn btn-outline btn-icon" @onclick="ToggleTheme">
+        @if (_isDarkTheme)
+        {
+            <i class="fas fa-sun"></i>
+        }
+        else
+        {
+            <i class="fas fa-moon"></i>
+        }
+    </button>
+</div>
+
+@code {
+    private bool _isDarkTheme;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the current theme from localStorage if available
+        var theme = "dark";//await JSRuntime.InvokeAsync<string>("localStorage.getItem", "theme");
+        _isDarkTheme = theme == "dark";
+
+        if (theme == null)
+        {
+            // Check for system preference
+            var prefersDark = await JSRuntime.InvokeAsync<bool>("window.matchMedia", "(prefers-color-scheme: dark)");
+            _isDarkTheme = prefersDark;
+            await SetTheme(_isDarkTheme ? "dark" : "light");
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        _isDarkTheme = !_isDarkTheme;
+        await SetTheme(_isDarkTheme ? "dark" : "light");
+    }
+
+    private async Task SetTheme(string theme)
+    {
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "theme", theme);
+        await JSRuntime.InvokeVoidAsync("document.documentElement.setAttribute", "data-theme", theme);
+    }
+
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; }
+}

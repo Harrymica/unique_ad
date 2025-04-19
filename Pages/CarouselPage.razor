@@ -1,0 +1,157 @@
+﻿@page "/auto-carousel"
+@using System.Timers
+@implements IDisposable
+@layout CustomLayout
+
+
+<div class="carousel_bag">
+    <div class="carousel-container">
+        
+
+            <div class="carousel-track" style="transform: translateX(-@(currentIndex * 100)%)">
+                @for (int i = 0; i < carouselItems.Count; i++)
+                {
+                    var item = carouselItems[i];
+                    <div class="carousel-slide">
+                        <div class="carousel-content">
+                            <div class="image-section">
+                                <img src="@item.Image" alt="@item.Title" />
+                            </div>
+                            <div class="description-section">
+                                <h2>@item.Title</h2>
+                                <p>@item.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="indicators">
+                @for (int i = 0; i < carouselItems.Count; i++)
+                {
+                    var index = i;
+                    <button @onclick="() => GoToSlide(index)"
+                            class="indicator @(index == currentIndex ? "active" : "")">
+                    </button>
+                }
+            </div>
+
+            @* <button class="nav-button prev" @onclick="PrevSlide">
+                <span class="arrow-left">←</span>
+            </button>
+
+            <button class="nav-button next" @onclick="NextSlide">
+                <span class="arrow-right">→</span>
+            </button> *@
+       
+</div>
+    </div>
+
+
+
+@code {
+    private List<CarouselItem> carouselItems = new List<CarouselItem>
+    {
+        new CarouselItem
+        {
+            Id = 1,
+            Image = "images/printing.png",
+            Title = "Beautiful Landscapes",
+            Description = "Explore stunning natural landscapes from around the world. From majestic mountains to serene beaches, these views will take your breath away."
+        },
+        new CarouselItem
+        {
+            Id = 2,
+            Image = "images/digital-printing.png",
+            Title = "Urban Architecture",
+            Description = "Discover remarkable architectural wonders in cities across the globe. Modern skyscrapers and historic buildings showcase human creativity and innovation."
+        },
+        new CarouselItem
+        {
+            Id = 3,
+            Image = "images/graphic-design.png",
+            Title = "Wildlife Photography",
+            Description = "Get up close with amazing wildlife captured in their natural habitats. These photographs reveal the beauty and diversity of animal life on our planet."
+        }
+    };
+
+    private int currentIndex = 0;
+    private bool isAutoPlaying = true;
+    private Timer autoPlayTimer;
+    private Timer resumeTimer;
+
+    protected override void OnInitialized()
+    {
+        // Set up auto-play timer - this makes the carousel auto-slide
+        autoPlayTimer = new Timer(5000); // 5 seconds interval
+        autoPlayTimer.Elapsed += AutoPlayTimerElapsed;
+        autoPlayTimer.AutoReset = true;
+        autoPlayTimer.Enabled = true; // Start auto-sliding immediately
+
+        // Set up resume timer
+        resumeTimer = new Timer(10000); // 10 seconds
+        resumeTimer.Elapsed += ResumeTimerElapsed;
+        resumeTimer.AutoReset = false;
+    }
+
+    // This method is called every 5 seconds to advance the slide automatically
+    private void AutoPlayTimerElapsed(object sender, ElapsedEventArgs e)
+    {
+        InvokeAsync(() =>
+        {
+            NextSlide();
+            StateHasChanged();
+        });
+    }
+
+    private void ResumeTimerElapsed(object sender, ElapsedEventArgs e)
+    {
+        InvokeAsync(() =>
+        {
+            isAutoPlaying = true;
+            autoPlayTimer.Enabled = true;
+            StateHasChanged();
+        });
+    }
+
+    private void NextSlide()
+    {
+        currentIndex = (currentIndex + 1) % carouselItems.Count;
+    }
+
+    private void PrevSlide()
+    {
+        PauseAutoPlay();
+        currentIndex = currentIndex == 0 ? carouselItems.Count - 1 : currentIndex - 1;
+    }
+
+    private void GoToSlide(int index)
+    {
+        PauseAutoPlay();
+        currentIndex = index;
+    }
+
+    private void PauseAutoPlay()
+    {
+        isAutoPlaying = false;
+        autoPlayTimer.Enabled = false;
+
+        // Reset and start the resume timer
+        resumeTimer.Stop();
+        resumeTimer.Start();
+    }
+
+    public void Dispose()
+    {
+        autoPlayTimer?.Dispose();
+        resumeTimer?.Dispose();
+    }
+
+    private class CarouselItem
+    {
+        public int Id { get; set; }
+        public string Image { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+    }
+}

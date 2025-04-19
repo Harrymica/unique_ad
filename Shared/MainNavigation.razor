@@ -1,0 +1,76 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div>
+    <!-- Mobile menu button -->
+    <button class="md:hidden p-2"
+            @onclick="ToggleMenu"
+            aria-label="@(isOpen ? "Close menu" : "Open menu")">
+        @if (isOpen)
+        {
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        }
+        else
+        {
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+        }
+    </button>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex space-x-6">
+        @foreach (var item in navItems)
+        {
+            <a href="@item.Href"
+               class="text-gray-700 hover:text-blue-600 font-medium">
+                @item.Name
+            </a>
+        }
+    </nav>
+
+    <!-- Mobile Navigation -->
+    @if (isOpen)
+    {
+        <div class="md:hidden absolute top-[108px] left-0 right-0 bg-white z-50 shadow-lg">
+            <nav class="flex flex-col p-4">
+                @foreach (var item in navItems)
+                {
+                    <a href="@item.Href"
+                       class="py-2 text-gray-700 hover:text-blue-600 font-medium"
+                       @onclick="() => CloseMenu()">
+                        @item.Name
+                    </a>
+                }
+            </nav>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isOpen = false;
+
+    private List<NavItem> navItems = new List<NavItem>
+    {
+        new NavItem { Name = "HOME", Href = "/" },
+        new NavItem { Name = "ABOUT", Href = "/about" },
+        new NavItem { Name = "SERVICES", Href = "/services" },
+        new NavItem { Name = "PORTFOLIO", Href = "/portfolio" },
+        new NavItem { Name = "CAREER", Href = "/career" },
+        new NavItem { Name = "CONTACT", Href = "/contact" }
+    };
+
+    private void ToggleMenu()
+    {
+        isOpen = !isOpen;
+    }
+
+    private void CloseMenu()
+    {
+        isOpen = false;
+    }
+
+    private class NavItem
+    {
+        public string Name { get; set; }
+        public string Href { get; set; }
+    }
+}
+

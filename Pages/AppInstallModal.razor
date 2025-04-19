@@ -1,0 +1,67 @@
+﻿@using uniquead_App.Data
+@inject AppInstallModalState ModalState
+
+@if (ModalState.IsOpen)
+{
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="relative bg-white p-4 rounded-lg max-w-3xl w-full mx-4">
+            <button @onclick="CloseModal"
+                    class="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
+                    aria-label="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            </button>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Left side - QR Code -->
+                <div class="bg-white p-4 text-center">
+                    <div class="bg-red-500 text-white p-2 mb-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="animate-pulse">🔥</span>
+                            <h3 class="font-bold">Install Our Android App</h3>
+                        </div>
+                    </div>
+
+                    <img src="images/qr-code.png"
+                         alt="QR Code for App Installation"
+                         class="mx-auto w-[200px] h-[200px]" />
+                    <p class="mt-2 font-semibold">uniquead.pk</p>
+                </div>
+
+                <!-- Right side - Business Cards -->
+                <div class="text-center">
+                    <img src="images/business-cards.png"
+                         alt="Business Cards"
+                         class="mx-auto w-[300px] h-[200px] object-contain" />
+                    <div class="mt-4">
+                        <h3 class="text-2xl font-bold">CARDS</h3>
+                        <p class="text-red-500 font-bold">Only in Rs.1000</p>
+                    </div>
+
+                    <div class="mt-4 text-sm">
+                        <p class="text-gray-700">
+                            Professional business cards at affordable prices.
+                            Contact us for more information.
+                        </p>
+                    </div>
+
+                    <div class="bg-blue-500 text-white p-2 mt-4 flex justify-around items-center">
+                        <div class="flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            <span>0333-5912893</span>
+                        </div>
+                        <span>uniquead</span>
+                        <span>www.uniquead.pk</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private void CloseModal()
+    {
+        ModalState.IsOpen = false;
+    }
+}
+

@@ -1,0 +1,103 @@
+﻿
+
+.box-container {
+    margin: 150px;
+   
+}
+
+.box h2{
+    font-size:1.8rem;
+    font-weight:800;
+    padding:10px 0px;
+    /*width: 100%;
+    border-bottom: 2px solid #467fbf;*/
+}
+
+.lead {
+    font-size: 1.25rem;
+    font-weight: 300;
+}
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 998px) {
+    .box-container {
+        margin: 20px;
+       
+    }
+}
+
+
+.dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1d1c1c;
+    z-index: 1000;
+    color: white;
+    max-width: 400px;
+    margin: auto;
+    height: 300px;
+    max-height: 300px;
+    border-radius: 15px;
+}
+
+.diag-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 100px;
+}
+
+.cancel {
+    display: flex;
+    justify-content: end;
+    cursor: pointer;
+}
+
+.tick {
+    
+    color: red;
+    font-size: 2rem;
+}
+.tick-success {
+    border:2px solid green;
+    border-radius:40%;
+    border-width:10px;
+    color: red;
+    font-size: 2rem;
+}
+.btm-diag {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.cancel-btn {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    height: 50px;
+    width: 100px;
+    background-color: #f90a0a;
+    border-radius: 5px;
+    /*margin:10px;*/
+    text-align: center;
+}
+
+.okay-btn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 50px;
+    width: 100px;
+    background-color: #049ec7;
+    border-radius: 5px;
+    text-align: center;
+}
+

@@ -1,0 +1,43 @@
+﻿@page "/imageslider"
+@inject IJSRuntime JS
+
+<div class="carousel">
+    <div class="carousel-track" id="carouselTrack">
+        @foreach (var image in images)
+        {
+            <img src="@image" class="carousel-item" />
+        }
+        @foreach (var image in images) // Duplicate for infinite effect
+        {
+            <img src="@image" class="carousel-item" />
+        }
+    </div>
+</div>
+@code {
+    private List<string> images = new List<string>
+    {
+        "images/0.png",
+        "images/1.png",
+        "images/0.png",
+        "images/10.png",
+        "images/2.png",
+        "images/13.png",
+        "images/19.png",
+        "images/23.png",
+        "images/21.png",
+        "images/4.png",
+        "images/6.png",
+        "images/8.png",
+        "images/9.png",
+    };
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("startCarousel");
+        }
+    }
+}
+

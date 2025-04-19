@@ -1,0 +1,27 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar @(_sidebarExpanded ? "expanded" : "collapsed")">
+        @* <AdminSideBar Expanded="_sidebarExpanded" /> *@
+        <AdminSideBar Expanded="@_sidebarExpanded" ExpandedChanged="@(v => _sidebarExpanded = v)" />
+
+       
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <div class="ml-auto">
+                <ThemeToggle />
+            </div>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private bool _sidebarExpanded = true;
+
+}

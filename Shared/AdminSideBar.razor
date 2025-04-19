@@ -1,0 +1,127 @@
+﻿@inject NavigationManager navMag
+
+<div class="sidebar-container">
+    <div class="sidebar-header">
+        <div class="logo-container">
+            <i class="fas fa-file-alt"></i>
+            @if (Expanded)
+            {
+                <span class="logo-text">Printing Press Admin</span>
+            }
+        </div>
+        <button class="sidebar-toggle" @onclick="ToggleSidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-content">
+       
+        <div class="sidebar-group">
+            <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="Navi">
+                 @* <NavLink class="sidebar-item" href="/dashboard" Match="NavLinkMatch.All" > *@
+                <i class="fas fa-home"></i>
+                @if (Expanded)
+                {
+                    <span>Dashboard</span>
+                }
+             @* </NavLink> *@
+            </div>
+           
+        </div>
+        <div class="sidebar-group">
+            <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="ToggleWebsiteSection">
+                <i class="fas fa-globe"></i>
+                @if (Expanded)
+                {
+                    <span>Website Management</span>
+                    <i class="fas fa-chevron-down @(_websiteExpanded ? "rotate" : "")"></i>
+                }
+            </div>
+            @if (_websiteExpanded && Expanded)
+            {
+                <div class="sidebar-group-content">
+                    <NavLink class="sidebar-item" href="/feedback">
+                        <i class="fas fa-comment"></i>
+                        <span>Feedback</span>
+                    </NavLink>
+                    <NavLink class="sidebar-item" href="/applications">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Applications</span>
+                    </NavLink>
+                </div>
+            }
+        </div>
+
+        <div class="sidebar-group">
+            <div class="sidebar-group-header @(_databaseExpanded ? "expanded" : "")" @onclick="ToggleDatabaseSection">
+                <i class="fas fa-database"></i>
+                @if (Expanded)
+                {
+                    <span>Database Management(App)</span>
+                    <i class="fas fa-chevron-down @(_databaseExpanded ? "rotate" : "")"></i>
+                }
+            </div>
+            @if (_databaseExpanded && Expanded)
+            {
+                <div class="sidebar-group-content">
+                    <NavLink class="sidebar-item" href="/users">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </NavLink>
+                    <NavLink class="sidebar-item" href="/orders">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Orders</span>
+                    </NavLink>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="sidebar-footer">
+        <NavLink class="sidebar-item" href="/settings">
+            <i class="fas fa-cog"></i>
+            @if (Expanded)
+            {
+                <span>Settings</span>
+            }
+        </NavLink>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool Expanded { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<bool> ExpandedChanged { get; set; }
+
+    private bool _websiteExpanded = true;
+    private bool _databaseExpanded = true;
+
+
+    private async Task Navi()
+    {
+        navMag.NavigateTo("/dashboard");
+    }
+    private async Task ToggleSidebar()
+    {
+        Expanded = !Expanded;
+        await ExpandedChanged.InvokeAsync(Expanded);
+    }
+
+    private void ToggleWebsiteSection()
+    {
+        if (Expanded)
+        {
+            _websiteExpanded = !_websiteExpanded;
+        }
+    }
+
+    private void ToggleDatabaseSection()
+    {
+        if (Expanded)
+        {
+            _databaseExpanded = !_databaseExpanded;
+        }
+    }
+}

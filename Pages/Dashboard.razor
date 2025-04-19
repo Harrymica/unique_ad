@@ -1,0 +1,73 @@
+﻿@page "/dash"
+@using Supabase
+@using Supabase.Gotrue
+@* @attribute [Authorize] *@
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
+@layout AdminLayout
+@inject IAuthService authstate
+
+@* <AuthorizeView>
+
+        <Authorized>
+
+        <h3>Dashboard</h3>
+
+        <p>Welcome to the protected dashboard!</p>
+        </Authorized>
+        <NotAuthorized>
+            <p>your not authorized</p>
+        </NotAuthorized>
+</AuthorizeView> *@
+@if (email != null)
+{
+    <p>Welcome to the protected dashboard! @email</p>
+
+}
+else
+{
+    <p>Sorry you're not authenticated</p>
+}
+@code {
+    private RegisterModel user;
+    private string message;
+    private string email;
+    protected override async Task OnInitializedAsync()
+    {
+        var options = new SupabaseOptions
+            {
+                AutoRefreshToken = true,
+                AutoConnectRealtime = true
+            };
+        var _supabaseClient = new Supabase.Client("https://fdrgzitfconvsemozgkv.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkcmd6aXRmY29udnNlbW96Z2t2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQxODE4MTcsImV4cCI6MjA1OTc1NzgxN30.uWwnlIdw7WJHNFkiHVtECVKCecrfvnMmZwzKNtpieM4", options);
+
+        var getUser = _supabaseClient.Auth.CurrentUser;
+        if(authstate != null)
+        {
+            user = await authstate.GetAdmin();
+            if(user != null && user.Email != null)
+            email = user.Email;
+        }
+
+        // if(getUser == null)
+        // {
+        //     Navigation.NavigateTo("/login");
+        // }
+        // else
+        // {
+        //     message = "Welcome brah";
+        // }
+
+       // var authState = await AuthProvider.GetAuthenticationStateAsync();
+       // var user = authState.User;
+
+        // if (!user.Identity.IsAuthenticated)
+        // {
+        //     Navigation.NavigateTo("/login");
+        // }
+        // if(user.Identity.Name == null)
+        // {
+        //     Navigation.NavigateTo("/login");
+        // }
+    }
+}

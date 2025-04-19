@@ -1,0 +1,162 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager navMag
+@inject IAuthService authService
+<PageTitle>uniquead_App</PageTitle>
+
+<div >
+    <div class="toast">
+    <BlazoredToasts />
+    </div>
+
+    <div class="topBar">
+        <div class="topBar_flex">
+            <div class="left-content">Call: 0333-5912893 or Email: online@uniquead.pk</div>
+            <div class="right-content">
+                @if (noLogedin == true)
+                {
+                <span @onclick="Login"><i class="fa-solid fa-right-to-bracket"></i> <a class="d_text">Sign In</a></span>
+                <span @onclick="Register"><i class="fa-solid fa-user"></i> <a class="d_text">Sign Up</a></span>
+                    
+                }
+                else{
+                    <span @onclick="Login"><a class="d_text">@email</a></span>
+                    <span @onclick="LogOut"><i class="fa-solid fa-right-from-bracket"></i> <a class="d_text">LogOut</a></span>
+                }
+                <span><i class="fa-brands fa-facebook-f"></i></span>
+                <span><i class="fa-solid fa-envelope"></i></span>
+                <span> <ThemeToggle /></span>
+            </div>
+        </div>
+    </div>
+    <div class="top">
+        <div class="topMenu">
+            <div class="topMenuCont">
+                <div class="left">
+                    <img src="/site-logo.png" class="responsive-logo" />
+                </div>
+
+                <div class="right">
+                    <div class="desktop-menu">
+                        <a>
+                            <NavLink href="" Match="NavLinkMatch.All" class="nav-link" id="link">HOME</NavLink>
+                        </a>
+                        <a>
+                            <NavLink href="/aboutus" class="nav-link" id="link">ABOUT US</NavLink>
+                        </a>
+                        <a>
+                            <NavLink href="/productpage" class="nav-link" id="link">PRODUCT</NavLink>
+                        </a>
+                        <a>
+                            <NavLink href="/carrier" class="nav-link">CARRIER</NavLink>
+                        </a>
+                        <a>
+                            <NavLink href="/contact" class="nav-link">CONTACT</NavLink>
+                        </a>
+
+                        @if (showDashboard)
+                        {
+                            <a>
+                                <NavLink href="/dashboard" class="nav-link" @onclick="ToggleNavMenu">DASHBOARD</NavLink>
+
+                            </a>
+                        }
+                    </div>
+                    <div class="mobile-menu">
+                        <button class="hamburger " @onclick="ToggleNavMenu">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <div class="dropdown-menu @(collapseNavMenu ? "collapsed" : "")">
+                            <NavLink href="" Match="NavLinkMatch.All" class="nav-link" id="link" @onclick="ToggleNavMenu">HOME</NavLink>
+                            <NavLink href="/aboutus" class="nav-link" id="link" @onclick="ToggleNavMenu">ABOUT US</NavLink>
+                            <NavLink href="/productpage" class="nav-link" id="link" @onclick="ToggleNavMenu">PRODUCT</NavLink>
+                            <NavLink href="/carrier" class="nav-link" @onclick="ToggleNavMenu">CARRIER</NavLink>
+                            <NavLink href="/contact" class="nav-link" @onclick="ToggleNavMenu">CONTACT</NavLink>
+                            @if(showDashboard)
+                            { 
+                                 <NavLink href="/dashboard" class="nav-link" @onclick="ToggleNavMenu">DASHBOARD</NavLink>
+                                
+                             }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <article class="content">
+            @Body
+        </article>
+    </main>
+    <Footer />
+     
+
+</div>
+
+
+@code {
+    private bool noLogedin = true;
+    private bool collapseNavMenu = true;
+
+    private bool showSuccessModal = false;
+    private string email;
+    private bool showDashboard = false;
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await authService.GetCurrentUser();
+        if (response != null)
+        {
+            noLogedin = false;
+            email = response!.Email;
+        }
+        var adminResponse = await authService.GetAdmin();
+
+        if (adminResponse != null && adminResponse.Email != null)
+        {
+            showDashboard = true;
+            Console.WriteLine("adminResponse is not null");
+        }
+        else
+        {
+            Console.WriteLine("adminResponse is null");
+
+        }
+    }
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    // Method to show the success modal after registration
+    public void ShowSuccessMessage()
+    {
+        showSuccessModal = true;
+        StateHasChanged();
+    }
+
+    // Handle modal visibility changes
+    private void HandleModalVisibilityChanged(bool visible)
+    {
+        showSuccessModal = visible;
+        StateHasChanged();
+    }
+
+    private async Task Login()
+    {
+        navMag.NavigateTo("/login");
+    }
+    private async Task LogOut()
+    {
+        var response =  authService.SignOutAsync();
+        if (response!= null)
+        {
+            
+        navMag.NavigateTo("/login");
+        }
+    }
+    private async Task Register()
+    {
+        navMag.NavigateTo("/register");
+    }
+}

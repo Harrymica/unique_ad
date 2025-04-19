@@ -1,0 +1,36 @@
+﻿.dashboard-container h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.card {
+    height: 100%;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+    .card-header h3 {
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .card-header i {
+        color: var(--sidebar-foreground);
+    }
+
+.card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.card-trend {
+    font-size: 0.75rem;
+    color: var(--sidebar-foreground);
+}

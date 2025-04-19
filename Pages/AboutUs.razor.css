@@ -1,0 +1,54 @@
+﻿#heading-breadcrumbs {
+    background-image: url('/images/polygon.jpg');
+    background-size: cover;
+    filter: grayscale(80);
+    background-repeat: no-repeat;
+    height: 100px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bg-gray {
+    background-color: #e9ecef;
+}
+
+.heading {
+    margin: 10px 0px;
+}
+.heading h2 {
+    
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+.Sboder {
+    width: 100px;
+    border-bottom: 2px solid #467fbf;
+    
+}
+.box-container{
+    margin:20px 150px;
+    /*max-width:1020px;*/
+}
+#marg {
+    margin: auto;
+    max-width:980px;
+}
+@media (max-width:820px){
+    #team {
+        display: flex;
+        
+        justify-content: center;
+        align-items: center;
+    }
+    .team-member {
+        margin-bottom: 40px;
+        align-items: center;
+        margin-bottom: 40px;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+    }
+}
+

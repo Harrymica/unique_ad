@@ -1,0 +1,57 @@
+﻿@page "/dashboard"
+@layout AdminLayout
+<PageTitle>Dashboard - Printing Press Admin</PageTitle>
+
+<div class="dashboard-container">
+    <h1>Dashboard</h1>
+
+    <div class="grid grid-cols-4">
+        <div class="card">
+            <div class="card-header">
+                <h3>Total Users</h3>
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-value">1,234</div>
+                <div class="card-trend">+12% from last month</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Active Orders</h3>
+                <i class="fas fa-print"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-value">45</div>
+                <div class="card-trend">+5% from last month</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Applications</h3>
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-value">23</div>
+                <div class="card-trend">+2 new today</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Feedback</h3>
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="card-content">
+                <div class="card-value">18</div>
+                <div class="card-trend">5 unread messages</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Dashboard logic would go here
+}

@@ -1,0 +1,287 @@
+﻿@page "/register"
+@inject IAuthService authService
+@inject IJSRuntime jsRuntime
+@inject NavigationManager navMag
+@inject IToastService toast
+
+<div id="heading-breadcrumbs">
+    <div class="container">
+        <div class="row d-flex align-items-center flex-wrap">
+            <div class="col-md-7">
+                <h1 class="h2">New Account / Sign In</h1>
+            </div>
+            <div class="col-md-5">
+                <ul class="breadcrumb d-flex justify-content-end">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active">New Account / Sign In</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="box-container">
+
+
+<div id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="box">
+                    @* <div class="hor"></div> *@
+                    <hr/>
+                    <h2 class="text-uppercase">New account</h2>
+                    <p class="lead">Not our registered customer yet?</p>
+                    <p>With registration with us new world of advertising, marketing, printing and much more opens to you! The whole process will not take you more than a minute!</p>
+                    <hr>
+                    <div  id="customer-sign-up" autocomplete="off" novalidate="novalidate">
+                     <EditForm Model="@_registerModel" OnValidSubmit="Register">
+                                <DataAnnotationsValidator /> 
+                                
+                        <div class="form-group">
+                            <label for="name-login">Name</label>
+                                <input id="name-login" autocomplete="off" required="" type="text" class="form-control" @bind-value="_registerModel.Name" aria-required="true">
+                                    <ValidationMessage For="@(() => _registerModel.Name)" />
+
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile-login">Mobile (Password will be received on this number)</label>
+                                <input id="mobile-login" @bind-value="_registerModel.PhoneNumber"  autocomplete="off" required="" type="text" class="form-control" aria-required="true">
+                                    <ValidationMessage For="@(() => _registerModel.PhoneNumber)" />
+
+                        </div>
+                        <div class="form-group">
+                            <label for="email-login">Email Address</label>
+                                <input id="email-login" @bind-value="_registerModel.Email"  autocomplete="off" required="" type="email" class="form-control" aria-required="true">
+                                    <ValidationMessage For="@(() => _registerModel.Email)" />
+
+                        </div>
+                            <div class="form-group">
+                                <label for="email-login">Password</label>
+                                <input id="email-login" @bind-value="_registerModel.password" autocomplete="off" required="" type="password" class="form-control" aria-required="true">
+                                    <ValidationMessage For="@(() => _registerModel.password)" />
+                            </div>
+
+                        <div class="form-group">
+                            <label for="dob-login">Date of Birth (For Birthday Wishes)</label>
+                                <input id="dob-login" @bind-value="_registerModel.Date"  autocomplete="off" required="" type="date" class="form-control" aria-required="true">
+                                    <ValidationMessage For="@(() => _registerModel.Date)" />
+
+                        </div>
+                        <div class="form-group">
+                            <label for="email-login">Profession</label>
+                            <select @bind="_registerModel.Profession" class="form-control" id="ddlProfession"  required="" aria-required="true">
+                                    <option value="None">None</option>
+                                    <option value="Teacher / Professor">Teacher / Professor</option>
+                                    <option value="Lawyer / Consultant">Lawyer / Consultant</option>
+                                    <option value="Politician">Politician</option>
+                                    <option value="Police Officer / Person">Police Officer / Person</option>
+                                    <option value="Doctor / Pharmacist">Doctor / Pharmacist</option>
+                                    <option value="Advertiser / Printer">Advertiser / Printer</option>
+                                    <option value="Journalist / Reporter">Journalist / Reporter</option>
+                                    <option value="Business Man / Shop keeper">Business Man / Shop keeper</option>
+                                    <option value="Military Person">Military Person</option>
+                            </select>
+                                    <ValidationMessage For="@(() => _registerModel.Profession)" />
+
+                        </div>
+                        <div class="form-group">
+                                <label for="email-login">District</label>
+                                <select class="form-control" @bind="_registerModel.District" id="ddlDistrict"  required="" aria-required="true">
+                                    <option value="" selected="" disabled="">--- SELECT YOUR DISTRICT ---</option>
+                                    <option value="CHAKWAL">CHAKWAL</option>
+                                    <option value="RAWALPINDI">RAWALPINDI</option>
+                                    <option value="JEHLUM">JEHLUM</option>
+                                    <option value="ATTOCK">ATTOCK</option>
+                                    <option value="TALAGANG">TALAGANG</option>
+                                    <option value="MURREE">MURREE</option>
+                                    <option value="SARGODHA">SARGODHA</option>
+                                    <option value="KHUSHAB">KHUSHAB</option>
+                                    <option value="MIANWALI">MIANWALI</option>
+                                    <option value="BHAKKAR">BHAKKAR</option>
+                                    <option value="GUJRANWALA">GUJRANWALA</option>
+                                    <option value="SIALKOT">SIALKOT</option>
+                                    <option value="NAROWAL">NAROWAL</option>
+                                    <option value="FAISALABAD">FAISALABAD</option>
+                                    <option value="JHANG">JHANG</option>
+                                    <option value="CHINIOT">CHINIOT</option>
+                                    <option value="TOBA TEK SINGH">TOBA TEK SINGH</option>
+                                    <option value="LAHORE">LAHORE</option>
+                                    <option value="KASUR">KASUR</option>
+                                    <option value="NANKANA SAHIB">NANKANA SAHIB</option>
+                                    <option value="SHEIKHUPURA">SHEIKHUPURA</option>
+                                    <option value="SAHIWAL">SAHIWAL</option>
+                                    <option value="OKARA">OKARA</option>
+                                    <option value="PAKPATTAN">PAKPATTAN</option>
+                                    <option value="MULTAN">MULTAN</option>
+                                    <option value="KHANEWAL">KHANEWAL</option>
+                                    <option value="VEHARI">VEHARI</option>
+                                    <option value="LODHRAN">LODHRAN</option>
+                                    <option value="BAHAWALPUR">BAHAWALPUR</option>
+                                    <option value="BAHAWALNAGAR">BAHAWALNAGAR</option>
+                                    <option value="RAHIM YAR KHAN">RAHIM YAR KHAN</option>
+                                    <option value="DERA GHAZI KHAN">DERA GHAZI KHAN</option>
+                                    <option value="LAYYAH">LAYYAH</option>
+                                    <option value="MUZAFFARGARH">MUZAFFARGARH</option>
+                                    <option value="RAJANPUR">RAJANPUR</option>
+                                    <option value="TAUNSA SHAREEF">TAUNSA SHAREEF</option>
+                                    <option value="KOT ADDU">KOT ADDU</option>
+                                    <option value="ISLAMABAD">ISLAMABAD</option>
+                                    <option value="GILGIT">GILGIT</option>
+                                    <option value="SKARDU">SKARDU</option>
+                                    <option value="MIRPUR">MIRPUR</option>
+                                    <option value="MUZAFFARABAD">MUZAFFARABAD</option>
+                                    <!-- Add more districts as needed -->
+                                </select>
+                                    <ValidationMessage For="@(() => _registerModel.District)" />
+
+                            </div>
+
+                        
+                        <div class="form-group">
+                            <label for="address-login">Address</label>
+                            <input @bind="_registerModel.Address" id="address-login"  autocomplete="off" required="" type="text" class="form-control" aria-required="true">
+                                    <ValidationMessage For="@(() => _registerModel.Address)" />
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-4">
+                                    <button type="submit" class="btn btn-template-outlined"><i class="fa fa-user-md"></i>
+                                            @if (isLoading)
+                                            {
+                                                <div class="spinner-border spinner-border-sm mr-2" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <span>Registering...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Register</span>
+                                            }
+                                        </button>
+                                        
+                            </div>
+
+                            <div class="col-lg-1">
+                                <div id="register">
+                                    <span>&nbsp;</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-lg-7">
+                                <button type="button" onclick="GoogleLogin();" style="width: 100%; outline-color: red" class="btn btn-outline-danger"><i class="fa fa-google"></i> Sign Up using google</button>
+                            </div>
+                        </div>
+                            </EditForm>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="box">
+                        <hr />
+
+                    <h2 class="text-uppercase">Login</h2>
+                    <p class="lead">Already our customer?</p>
+                    <p class="text-muted">Enter your login credentials to enter your unique world of advertising.</p>
+                    <hr>
+                        <EditForm Model="@_registerModel" OnValidSubmit="Register">
+                                <DataAnnotationsValidator />
+                             <div>
+                        <div class="form-group">
+                            <label for="email">Email / Phone</label>
+                            <input id="email" name="txtUserName" type="text" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input id="password" name="txtPassword" type="password" class="form-control">
+                                    <ValidationMessage For="@(() => _registerModel.password)" />
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-9">
+                            </div>
+                            <div class="col-sm-12 col-lg-3 text-right">
+                                <button type="submit" name="btnLogin" class="btn btn-template-outlined"><i class="fa fa-sign-in"></i> Log in</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                                </EditForm>
+                </div>
+                <p class="text-muted">If you have any questions, please feel free to <a target="_blank" href="https://uniquead.pk/contact">contact us</a>, our customer service center is working for you 24/7.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@if (isRegisterFailed == true)
+{
+    <div class="dialog">
+        <p class="cancel" @onclick="cancelDialog">✖️</p>
+        <div class="diag-content">
+
+            <span class="tick">!</span>
+            <div class="diag-text">
+                <p> @ErrorMsg </p>
+            </div>
+        </div>
+
+    </div>
+
+}
+
+@if (isRegisterSuccessfull == true)
+{
+    <div class="dialog">
+        <p class="cancel" @onclick="cancelDialog">✖</p>
+        <div class="diag-content">
+
+            <span class="tick-success">✔️</span>
+            <div class="diag-text">
+                <p> @ErrorMsg </p>
+            </div>
+        </div>
+
+    </div>
+
+}
+
+@code {
+    private RegisterModel _registerModel = new RegisterModel();
+    private bool isRegisterSuccessfull = false;
+    private bool isRegisterFailed = false;
+    private bool isLoading = false;
+    private string ErrorMsg;
+
+    private async Task Register()
+    {
+        isLoading = true;
+        await Task.Delay(3000);
+        var response = await authService.SignUpAsyncWithResponse(_registerModel);
+        if(response != null)
+        {
+            isRegisterSuccessfull = true;
+            ErrorMsg = response.Message;
+            isLoading = false;
+
+        }
+        else
+        {
+            isRegisterFailed = true;
+            ErrorMsg = response.Message;
+            isLoading = false;
+
+        }
+    }
+
+    private async Task cancelDialog()
+    {
+        isRegisterFailed = false;
+        isRegisterSuccessfull = false;
+
+
+    }
+
+    
+
+}

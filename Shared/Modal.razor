@@ -1,0 +1,61 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade @(_isVisible ? "show" : "")" id="registrationSuccessModal" tabindex="-1" role="dialog"
+     style="display: @(_isVisible ? "block" : "none");" aria-labelledby="registrationSuccessModalLabel" aria-hidden="@(!_isVisible)">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="close" @onclick="Close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center pb-5">
+                <div class="d-flex justify-content-center mb-4">
+                    <div class="bg-success-light rounded-circle p-4" style="width: 80px; height: 80px;">
+                        <i class="fa fa-check-circle text-success" style="font-size: 40px;"></i>
+                    </div>
+                </div>
+                <h2 class="modal-title font-weight-bold" id="registrationSuccessModalLabel">Registration Successful!</h2>
+                <p class="text-muted mt-3">
+                    Your account has been created successfully. You can now log in with your credentials.
+                </p>
+                <div class="mt-4">
+                    <button type="button" class="btn btn-template-outlined" @onclick="GoToLogin">
+                        Go to Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (_isVisible)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    private bool _isVisible = false;
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    public void Show()
+    {
+        _isVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task Close()
+    {
+        _isVisible = false;
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task GoToLogin()
+    {
+        _isVisible = false;
+        await OnClose.InvokeAsync();
+        await JSRuntime.InvokeVoidAsync("scrollToElement", "customer-sign-in");
+    }
+}

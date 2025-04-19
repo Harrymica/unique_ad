@@ -1,0 +1,251 @@
+﻿.btn {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.caro{
+    background-color:grey;
+}
+.btn-template-main {
+  background: #467fbf;
+  border: 1px solid #467fbf !important;
+  color: #fff !important;
+  border-radius: 0 !important;
+  text-decoration: none;
+}
+
+#packages{
+    margin: 0 200px;
+}
+.background-pentagon {
+   
+    background-image: url('images/polygon.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: white;
+    filter: grayscale(80);
+    margin: 0;
+}
+section {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:50px;
+}
+
+/*Custom styling*/ /**/
+.carousel_bag {
+    background-color: #073057;
+    height: calc(100vh);
+    display: flex;
+    justify-content: center;
+}
+
+.carousel-container {
+    width: 100%;
+    max-width: 960px;
+    margin: auto;
+    
+}
+
+.slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #e9ecef;
+}
+
+    .slide .heading h2 {
+        /*border-bottom: 5px solid blue;*/
+        line-height: 1.1;
+        display: inline-block;
+        margin-bottom: 0;
+        padding-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+        .slide .heading h2 ::after {
+            content: " he";
+            display: block;
+            width: 100px;
+            height: 2px;
+            margin-top: .6rem;
+            background: #467fbf;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    .carousel-track {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        width: 100%;
+    }
+
+.carousel-slide {
+    flex: 0 0 calc(100% / 5); /* Assuming 5 images per slide */
+    min-width: calc(100% / 5);
+    padding: 5px;
+    
+}
+
+    .carousel-slide img {
+        max-width: 100%;
+        height: auto;
+        margin: auto;
+    }
+
+.carousel-content {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .carousel-content {
+        flex-direction: row;
+    }
+}
+
+.image-section {
+    width: 100%;
+    position: relative;
+    display:flex;
+    justify-content:center;
+    max-height:200px;
+}
+
+@media (max-width: 996px) {
+    #num {
+        margin: 10px;
+      
+        
+    }
+    #packages{
+        margin:0px;
+    }
+    .img-box img{
+        margin:0;
+        width:100%;
+    }
+    }
+
+.image-section img {
+    max-width: 150px;
+    max-height: 150px;
+    filter:grayscale(100%);
+}
+.img-box img{
+    max-width: 150px;
+    max-height: 150px;
+    filter: grayscale(100%);
+}
+
+@media (min-width: 768px) {
+    .image-section img {
+        aspect-ratio: auto;
+        height: 400px;
+    }
+}
+
+.description-section {
+    width: 100%;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: transparent;
+    color: white;
+}
+
+    .description-section p {
+        color: white;
+    }
+
+@media (min-width: 768px) {
+    .description-section {
+        width: 50%;
+    }
+}
+
+.description-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.description-section p {
+    color: white;
+}
+
+.indicators {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    z-index: 20;
+}
+
+.indicator {
+    height: 0.5rem;
+    width: 0.5rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s;
+    border: none;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+    .indicator.active {
+        width: 2rem;
+        background-color: white;
+    }
+
+.nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+    .nav-button:hover {
+        background-color: white;
+    }
+
+.prev {
+    left: 1rem;
+}
+
+.next {
+    right: 1rem;
+}
+
+.arrow-left, .arrow-right {
+    font-size: 1.25rem;
+}
+.Sboder {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width: 100px;
+    border-bottom: 2px solid red;/*#467fbf;*/
+}
+.slide h2{
+    font-weight:600;
+    font-size:1.6rem;
+    padding:10px;
+    
+}

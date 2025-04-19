@@ -1,0 +1,15 @@
+﻿/* Add these styles to your site.css file */
+.bg-success-light {
+    background-color: rgba(40, 167, 69, 0.2);
+}
+
+/* Modal animation */
+.modal.fade.show {
+    opacity: 1;
+    transition: opacity 0.15s linear;
+}
+
+.modal-backdrop.fade.show {
+    opacity: 0.5;
+    transition: opacity 0.15s linear;
+}

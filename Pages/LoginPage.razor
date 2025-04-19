@@ -1,0 +1,131 @@
+﻿@page "/login"
+@using uniquead_App.Services.authState
+@inject IAuthService authService
+@inject NavigationManager navMag
+@inject AuthenticationStateProvider AuthProvider
+<div id="heading-breadcrumbs">
+    <div class="container">
+        <div class="row d-flex align-items-center flex-wrap">
+            <div class="col-md-7">
+                <h1 class="h2">Customer LogIn</h1>
+            </div>
+            <div class="col-md-5">
+                <ul class="breadcrumb d-flex justify-content-end">
+                    <li class="breadcrumb-item"><a href="https://uniquead.pk/">Home</a></li>
+                    <li class="breadcrumb-item active">Login</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="box-container">
+
+
+<div id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-sm-12"></div>
+            <div class="col-lg-6 col-sm-12">
+                <div class="box">
+                    <h2 class="text-uppercase">Login</h2>
+                    <p class="text-muted">Enter your login credentials to enter your unique world of advertising.</p>
+                    <hr>
+                    <div id="customer-sign-in" autocomplete="off">
+                        <EditForm Model="@login" OnValidSubmit="LoginUser">
+                                <DataAnnotationsValidator />
+                                
+                        <div class="form-group">
+                            <label for="email">Email / Phone</label>
+                                <input @bind-value="login.Email" id="email"  type="text" class="form-control">
+                                    <ValidationMessage For="@(() => login.Email)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input id="password" @bind-value="login.Password"  type="password" class="form-control">
+                                    <ValidationMessage For="@(() => login.Password)" />
+
+                            <div class="text-right">
+                                <a href="https://uniquead.pk/customer/account/reset">Forgot Password?</a>
+                            </div>
+                        </div>
+                        <div class="text-center">
+
+                                <button @onclick="LoginUser" type="submit" disabled="@isLoading" style="background-color:#18181b; color:white"
+                                        class="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 min-w-32">
+                                    @if (isLoading)
+                                    {
+                                        <div class="spinner-border spinner-border-sm mr-2" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <span>Logging in...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Login</span>
+                                    }
+                                </button>
+                        </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@if (isLoginSuccessfull == true)
+{
+    <div class="dialog">
+        <p class="cancel" @onclick="cancelDialog">✖️</p>
+        <div class="diag-content">
+
+        <span class="tick">!</span>
+        <div class="diag-text">
+                <p> @ErrorMsg </p>
+        </div>
+        </div>
+        
+    </div>
+    
+}
+
+@code {
+    private Login login= new Login();
+    private bool isLoading = false;
+    private bool isLoginSuccessfull = false;
+    private string ErrorMsg;
+
+    private async Task LoginUser()
+    {
+        isLoading = true;
+        await Task.Delay(3000);
+        var response = await authService.SignInAsyncWithResponse(login);
+        //isLoading = false;
+
+
+       if(response != null)
+        {
+            //await Task.Delay(4000);
+            isLoading = false;
+            // Simulate login process
+            ErrorMsg = response.Message;
+            StateHasChanged();
+        }
+        ErrorMsg = response.Message;
+
+        isLoginSuccessfull = true;
+        isLoading = false;
+
+         await Task.Delay(4000);
+         //isLoginSuccessfull = false;
+        // navMag.NavigateTo("/", forceLoad:true);
+    }
+    private async Task cancelDialog()
+    {
+        isLoginSuccessfull = false;
+
+    }
+}
+
+@* <button type="submit" name="btnLogin" class="btn btn-template-outlined" @onclick="LoginUser"><i class="fa fa-sign-in"></i> Log in</button> *@

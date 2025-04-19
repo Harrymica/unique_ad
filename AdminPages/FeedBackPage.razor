@@ -1,0 +1,233 @@
+﻿@page "/feedback"
+@layout AdminLayout
+@inject IApplicationService appServ
+
+<PageTitle>Feedback - Printing Press Admin</PageTitle>
+
+<div class="feedback-container">
+    <div class="page-header">
+        <h1>Customer Feedback</h1>
+        <div class="search-container">
+            <input type="text" class="form-control" placeholder="Search feedback..." @bind="_searchTerm" @bind:event="oninput" />
+            <button class="btn btn-outline" @onclick="Search">Search</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Message</th>
+                    <th>Replied</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in feedbacks)
+                {
+                    <tr>
+                        <td>@item.FirstName @item.LastName</td>
+                        <td>@item.Email</td>
+                        <td>@item.Subject</td>
+                        <td class="truncate">@item.Message</td>
+                        <td>
+                            <input type="checkbox" checked="@item.status" @onchange="e => HandleReplyStatus(item.Id, (bool)e.Value)" />
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-outline btn-icon" @onclick="() => OpenReplyDialog(item)">
+                                    <i class="fas fa-envelope"></i>
+                                </button>
+                                <button class="btn btn-outline btn-icon" @onclick="() => DeleteFeedback(item.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (_showReplyDialog)
+    {
+        <div class="dialog-overlay" @onclick="CloseReplyDialog">
+            <div class="dialog" @onclick:stopPropagation="true">
+                <div class="dialog-header">
+                    <h2>Reply to @_selectedFeedback?.FirstName @_selectedFeedback?.LastName</h2>
+                    <button class="dialog-close" @onclick="CloseReplyDialog">×</button>
+                </div>
+                <div class="dialog-content">
+                    <div class="form-group">
+                        <label class="form-label">To</label>
+                        <input type="text" class="form-control" value="@_selectedFeedback?.Email" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" value="Re: @_selectedFeedback?.Subject" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" rows="5" @bind="_replyText" placeholder="Type your reply here..."></textarea>
+                    </div>
+                </div>
+                <div class="dialog-footer">
+                    <button class="btn btn-outline" @onclick="CloseReplyDialog">Cancel</button>
+                    <button class="btn btn-primary" @onclick="SendReply">Send Reply</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<FeedbackItem> _feedback = new List<FeedbackItem>();
+    private List<FeedbackItem> _filteredFeedback = new List<FeedbackItem>();
+    private string _searchTerm = "";
+    private bool _showReplyDialog = false;
+    private feedBackModel _selectedFeedback;
+    private string _replyText = "";
+
+
+    private List<feedBackModel> feedbacks = new List<feedBackModel>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize with sample data
+        _feedback = new List<FeedbackItem>
+        {
+            new FeedbackItem
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john.doe@example.com",
+                Subject = "Print Quality Issue",
+                Message = "The colors on my brochure print were not as vibrant as expected.",
+                Replied = false
+            },
+            new FeedbackItem
+            {
+                Id = 2,
+                FirstName = "Jane",
+                LastName = "Smith",
+                Email = "jane.smith@example.com",
+                Subject = "Great Service",
+                Message = "I wanted to thank you for the quick turnaround on my business cards.",
+                Replied = true
+            },
+            new FeedbackItem
+            {
+                Id = 3,
+                FirstName = "Michael",
+                LastName = "Johnson",
+                Email = "michael.j@example.com",
+                Subject = "Delivery Question",
+                Message = "I was wondering if you offer expedited shipping for large poster orders?",
+                Replied = false
+            },
+            new FeedbackItem
+            {
+                Id = 4,
+                FirstName = "Sarah",
+                LastName = "Williams",
+                Email = "sarah.w@example.com",
+                Subject = "Custom Order Inquiry",
+                Message = "I need a custom size for my company banners. Is this possible?",
+                Replied = true
+            },
+            new FeedbackItem
+            {
+                Id = 5,
+                FirstName = "Robert",
+                LastName = "Brown",
+                Email = "robert.b@example.com",
+                Subject = "Pricing Question",
+                Message = "Could you provide a quote for 500 tri-fold brochures with glossy finish?",
+                Replied = false
+            }
+        };
+
+        _filteredFeedback = _feedback;
+
+        feedbacks = await appServ.getFeedBackList();
+    }
+
+    private void Search()
+    {
+        if (string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            _filteredFeedback = _feedback;
+        }
+        else
+        {
+            _filteredFeedback = _feedback.Where(f =>
+                f.FirstName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                f.LastName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                f.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                f.Subject.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                f.Message.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+    }
+
+    private void DeleteFeedback(Guid id)
+    {
+        var item = feedbacks.FirstOrDefault(f => f.Id == id);
+        if (item != null)
+        {
+            feedbacks.Remove(item);
+            //_filteredFeedback = _filteredFeedback.Where(f => f.Id != id).ToList();
+        }
+    }
+
+    private async Task HandleReplyStatus(Guid id, bool status)
+    {
+        var item = feedbacks.FirstOrDefault(f => f.Id == id);
+       // var dFeedBAck = feedbacks.Where(i => i.Id == id).FirstOrDefault();
+        if (item != null)
+        {
+            item.status = status;
+            var response = await appServ.EditFeedBack(item);
+            //dFeedBAck.status = status;
+
+        }
+    }
+
+    private void OpenReplyDialog(feedBackModel feedback)
+    {
+        _selectedFeedback = feedback;
+        _replyText = "";
+        _showReplyDialog = true;
+    }
+
+    private void CloseReplyDialog()
+    {
+        _showReplyDialog = false;
+    }
+
+    private void SendReply()
+    {
+        if (_selectedFeedback != null)
+        {
+            // In a real app, you would send the email here
+            //_selectedFeedback.Replied = true;
+            _showReplyDialog = false;
+        }
+    }
+
+    public class FeedbackItem
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Subject { get; set; }
+        public string Message { get; set; }
+        public bool Replied { get; set; }
+    }
+}

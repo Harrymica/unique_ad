@@ -1,0 +1,145 @@
+﻿@page "/contact"
+@inject IApplicationService appSerV
+@inject IToastService toast
+
+<BlazoredToasts/>
+<div id="heading-breadcrumbs" class="brder-top-0 border-bottom-0">
+    <div class="container">
+        <div class="row d-flex align-items-center flex-wrap">
+            <div class="col-md-7">
+                <h1 class="h2">Contact</h1>
+
+            </div>
+            <div class="col-md-5">
+                <ul class="breadcrumb d-flex justify-content-end">
+                    <li class="breadcrumb-item"><a href="https://uniquead.pk/">Home</a></li>
+                    <li class="breadcrumb-item active">Contact</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="content">
+    <div id="contact" class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <section class="bar">
+                    <div class="heading">
+                        <h2>We are here to help you</h2>
+                        <div class="Sboder"></div>
+                    </div>
+                    <p class="lead">Are you curious about something? Do you have some kind of problem with our products?</p>
+                    <p class="text-sm">Please feel free to contact us, our customer service center is working for you 24/7.</p>
+                    <div class="heading">
+                        <h3>Contact form</h3>
+                    </div>
+                    <form id="contact-form" novalidate="novalidate">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="firstname">First Name</label>
+                                    <input id="firstname"  @bind-value="_feedBack.FirstName" required="" type="text" class="form-control" aria-required="true">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="lastname">Last Name</label>
+                                    <input id="lastname" type="text"  @bind-value="_feedBack.LastName" required="" class="form-control" aria-required="true">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input id="email" type="email"  @bind-value="_feedBack.Email" required="" class="form-control" aria-required="true">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="subject">Subject</label>
+                                    <input id="subject" type="text" @bind-value="_feedBack.Subject" required="" class="form-control" aria-required="true">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="message">Message</label>
+                                    <textarea id="message" rows="5" @bind="_feedBack.Message" required="" class="form-control" aria-required="true"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <button type="submit" @onclick="submit" class="btn btn-template-outlined"><i class="fa fa-envelope-o"></i> Send message</button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+            <div class="col-lg-4">
+                <section class="bar mb-0">
+                    <h3 class="text-uppercase">Address</h3>
+                    <p class="text-sm"><strong>Head Office:</strong><br>58 Ghazni Street, Urdu Bazar <br>Lahore, Punjab<br>Pakistan</p>
+                    <p class="text-sm"><strong>Area Office:</strong><br>Al-Fattah Market, Bhoun Road <br>Chakwal, Punjab<br>Pakistan</p>
+                    <h3 class="text-uppercase">Call center</h3>
+                    <p class="text-muted text-sm">Pick one of given number below to use our calling support.</p>
+                    <p><strong>+92 333 591 28 93</strong><br><strong>+92 321 591 28 93</strong></p>
+                    <h3 class="text-uppercase">Electronic support</h3>
+                    <p class="text-muted text-sm">Please feel free to write an email to us or to use our electronic support.</p>
+                    <ul class="text-sm">
+                        <li><strong><a href="mailto:uniquead.pk@gmail.com">admin@uniquead.pk</a></strong></li>
+                        <li><strong><a href="mailto:online@uniquead.pk">online@uniquead.pk</a></strong></li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1183.976716227838!2d72.85192530466205!3d32.93009703020058!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3920f710e2a2b7e3%3A0x84cb459718dff929!2sUNIQUE%20ADVERTIZER!5e0!3m2!1sen!2s!4v1570277448595!5m2!1sen!2s" width="100%" height="300" frameborder="0" style="border:0;" allowfullscreen=""></iframe>
+</div>
+
+@if (_showViewDialog)
+{
+    <div class="dialog-overlay" @onclick="CloseViewDialog">
+        <div class="dialog" @onclick:stopPropagation="true">
+            <div class="dialog-header">
+                <h2>Application Details</h2>
+                <button class="dialog-close" @onclick="CloseViewDialog">×</button>
+            </div>
+            <div class="dialog-content">
+                
+                    <div class="application-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Error:</div>
+                            <div class="detail-value">@msg</div>
+                        </div>
+                       
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private feedBackModel _feedBack = new feedBackModel();
+
+    private bool _showViewDialog = false;
+    private string msg = "";
+
+    private async Task submit()
+    {
+        _feedBack.status = false;
+        var response = await appSerV.Support_feedBack(_feedBack);
+        _showViewDialog = true;
+        if (response != null)
+        {
+            msg = "Feedback sent Successfully";
+        }
+        else
+        {
+            msg = "An Error occured, please try again";
+        }
+    }
+
+    private void CloseViewDialog()
+    {
+        _showViewDialog = false;
+    }
+}

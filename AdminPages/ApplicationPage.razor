@@ -1,0 +1,236 @@
+﻿@page "/applications"
+@layout AdminLayout
+@inject IApplicationService appServ
+@inject IJSRuntime jsRuntime
+<PageTitle>Applications - Printing Press Admin</PageTitle>
+
+<div class="applications-container">
+    <div class="page-header">
+        <h1>Job Applications</h1>
+        <div class="search-container">
+            <input type="text" class="form-control" placeholder="Search applications..." @bind="_searchTerm" @bind:event="oninput" />
+            <button class="btn btn-outline" @onclick="Search">Search</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Position</th>
+                    <th>Applied Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(models != null)
+                {
+                    
+                @foreach (var model in models)
+                {
+                    <tr>
+                        <td>@model.FirstName @model.LastName</td>
+                        <td>@model.Email</td>
+                        <td>@model.Position</td>
+                        <td>@model.CreatedAt</td>
+                        <td>@GetStatusBadge(model.status)</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-outline btn-icon" @onclick="() => ViewApplication(model)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline btn-icon dropdown-toggle">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasInterviewed)">
+                                            Mark as Interviewed
+                                        </button>
+                                        <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasHired)">
+                                            Mark as Hired
+                                        </button>
+                                        <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasRejected)">
+                                            Mark as Rejected
+                                        </button>
+                                        <button class="dropdown-item" @onclick="() => DeleteApplication(model)">
+                                            <i class="fas fa-trash mr-2"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                }
+                else
+                {
+                    <p>No application to display</p>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (_showViewDialog)
+    {
+        <div class="dialog-overlay" @onclick="CloseViewDialog">
+            <div class="dialog" @onclick:stopPropagation="true">
+                <div class="dialog-header">
+                    <h2>Application Details</h2>
+                    <button class="dialog-close" @onclick="CloseViewDialog">×</button>
+                </div>
+                <div class="dialog-content">
+                    @if (_selectedApplication != null)
+                    {
+                        <div class="application-details">
+                            <div class="detail-row">
+                                <div class="detail-label">Name:</div>
+                                <div class="detail-value">@_selectedApplication.FirstName, @_selectedApplication.LastName</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Email:</div>
+                                <div class="detail-value">@_selectedApplication.Email</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Position:</div>
+                                <div class="detail-value">@_selectedApplication.Position</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Applied:</div>
+                                <div class="detail-value">@_selectedApplication.CreatedAt.ToString()</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Status:</div>
+                                <div class="detail-value">@GetStatusBadge(_selectedApplication.status)</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">CV:</div>
+                                <div class="detail-value cv-file">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>@(_selectedApplication.FirstName.Replace(" ", "_"))_CV.pdf</span>
+                                    <button class="btn btn-outline btn-icon" type="submit" @onclick="()=> DownloadFile(_selectedApplication.Cv)">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    private string _searchTerm = "";
+    private bool _showViewDialog = false;
+    private ApplicationModel _selectedApplication;
+    private string MarkasInterviewed = "interview";
+    private string MarkasHired = "hired";
+    private string MarkasRejected = "rejected";
+
+    private List<ApplicationModel> models = new List<ApplicationModel>();
+    protected override async  Task OnInitializedAsync()
+    {
+
+        models = await appServ.getApplicationList();
+
+    }
+
+    private void Search()
+    {
+        if (string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            // _filteredApplications = _applications;
+        }
+        else
+        {
+            // _filteredApplications = _applications.Where(a =>
+            //     a.FullName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            //     a.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            //     a.Position.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
+            // ).ToList();
+        }
+    }
+
+    private async Task DeleteApplication(ApplicationModel model)
+    {
+        var response = await appServ.Deletepplication(model);
+        if (response != null)
+        {
+            models.Remove(model); // Remove it from the list
+            StateHasChanged();    // Tell Blazor to re-render
+        }
+    }
+
+    private async Task ChangeStatus(ApplicationModel model, string status)
+    {
+        model.status = status;
+        var response = await appServ.EditApplication(model);
+    }
+
+    private void ViewApplication(ApplicationModel application)
+    {
+        _selectedApplication = application;
+        _showViewDialog = true;
+    }
+
+    private void CloseViewDialog()
+    {
+        _showViewDialog = false;
+    }
+
+    private RenderFragment GetStatusBadge(string status)
+    {
+        return builder =>
+        {
+            builder.OpenElement(0, "span");
+
+            switch (status)
+            {
+                case "pending":
+                    builder.AddAttribute(1, "class", "badge badge-outline");
+                    builder.AddContent(2, "Pending");
+                    break;
+                case "interview":
+                    builder.AddAttribute(1, "class", "badge badge-info");
+                    builder.AddContent(2, "Interview");
+                    break;
+                case "rejected":
+                    builder.AddAttribute(1, "class", "badge badge-danger");
+                    builder.AddContent(2, "Rejected");
+                    break;
+                case "hired":
+                    builder.AddAttribute(1, "class", "badge badge-success");
+                    builder.AddContent(2, "Hired");
+                    break;
+                default:
+                    builder.AddAttribute(1, "class", "badge badge-outline");
+                    builder.AddContent(2, "Unknown");
+                    break;
+            }
+
+            builder.CloseElement();
+        };
+    }
+
+    private async Task DownloadFile(string name)
+    {
+        if (!string.IsNullOrEmpty(name))
+        {
+            var fileUrl = await appServ.GetFile(name);
+            if (!string.IsNullOrEmpty(fileUrl))
+            {
+                // Trigger the download by opening the URL in a new tab
+             
+               /// await jsRuntime.InvokeVoidAsync("open", fileUrl, "_blank");
+                await jsRuntime.InvokeVoidAsync("downloadFile", fileUrl);
+            }
+        }
+    }
+    
+}

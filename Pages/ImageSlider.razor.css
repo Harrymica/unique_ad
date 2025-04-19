@@ -1,0 +1,31 @@
+﻿
+.carousel {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    position: relative;
+    background-color:grey;
+}
+
+.carousel-track {
+    display: flex;
+    animation: scroll 10s linear infinite;
+}
+
+.carousel-item {
+    width: 200px; /* Adjust size */
+    height: 150px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(0%);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+

@@ -1,0 +1,128 @@
+﻿@page "/carrier"
+@inject IApplicationService appServ
+
+<div id="heading-breadcrumbs" class="brder-top-0 border-bottom-0">
+    <div class="container">
+        <div class="row d-flex align-items-center flex-wrap">
+            <div class="col-md-7">
+                <h1 class="h2">Career</h1>
+            </div>
+            <div class="col-md-5">
+                <ul class="breadcrumb d-flex justify-content-end">
+                    <li class="breadcrumb-item"><a href="https://uniquead.pk/">Home</a></li>
+                    <li class="breadcrumb-item active">Career</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="content">
+    <div class="container">
+        <section class="bar">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="heading">
+                        <h2>Come Work With Us</h2>
+                        <div class="Sboder"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="offset-lg-3 col-lg-6 col-sm-12">
+                    <form enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-6 form-group">
+                                <label>First Name *</label>
+                                <input type="text" @bind-value="_application.FirstName" required=""  class="form-control">
+                            </div>
+                            <div class="col-sm-12 col-lg-6 form-group">
+                                <label>Last Name *</label>
+                               <input type="text"  required="" @bind-value="_application.LastName"  class="form-control">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-6 form-group">
+                                <label>Primary Contact *</label>
+                                <input type="text" @bind-value="_application.Contact" id="mobile" required=""  class="form-control">
+                            </div>
+                            <div class="col-sm-12 col-lg-6 form-group">
+                                <label>Email Address *</label>
+                                <input type="email" @bind-value="_application.Email" required=""  class="form-control">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-6 form-group">
+                                <label>Applying As *</label>
+                                <select @bind="_application.Apply_As" required="" class="form-control">
+                                    <option selected="" value="Internship">Internship</option>
+                                    <option value="Freelancer (Online Job)">Freelancer (Online Job)</option>
+                                    <option value="Contract / Part Time">Contract / Part Time</option>
+                                    <option value="Permanent / Full Time">Permanent / Full Time</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-12 col-lg-6 form-group">
+                                <label>Select Position *</label>
+                                <select @bind="_application.Position" required="" class="form-control">
+                                    <option selected="" value="Receptionist / Cashier">Receptionist / Cashier</option>
+                                    <option value="Production Manager">Production Manager</option>
+                                    <option value="Branch Manager">Branch Manager</option>
+                                    <option value="Graphics Designer">Graphics Designer</option>
+                                    <option value="Flex Machine Operator">Flex Machine Operator</option>
+                                    <option value="Fabricator">Fabricator</option>
+                                    <option value="Book Binder">Book Binder</option>
+                                    <option value="Sales Staff">Sales Staff</option>
+                                    <option value="Helper / General Worker">Helper / General Worker</option>
+                                    <option value="Office Boy">Office Boy</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label>Upload CV *</label> <br>
+                                <InputFile id="image" class="form-control" rows="3" style="background-color:white;" OnChange="HandleFileChange"
+                                           type="file" multiple accept=".png, .jpg, .jpeg, .pdf" />
+                       
+                            </div>
+                        </div>
+
+                       
+                        <div class="col-md-12 text-center">
+                            <button type="submit"  class="btn btn-template-outlined" @onclick="Submit">
+                                <i class="fa fa-envelope-o"></i> Submit
+                            </button>
+                        </div>
+                    </form>
+                    <br>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@code{
+    private ApplicationModel _application = new ApplicationModel();
+    private IBrowserFile? file;
+    private long maxSize = 1024 * 1024 * 10;
+
+
+    private async Task Submit()
+    {
+        if (file != null && _application != null)
+        {
+            _application.CreatedAt = DateTime.Now;
+            await appServ.SubmitApplication(_application, file);
+        }
+
+    }
+
+    private async Task HandleFileChange(InputFileChangeEventArgs e)
+    {
+
+        file = e.File;  
+    }
+
+   
+
+}

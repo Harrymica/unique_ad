@@ -1,0 +1,298 @@
+﻿@page "/users"
+@layout AdminLayout
+
+<PageTitle>Users - Printing Press Admin</PageTitle>
+
+<div class="users-container">
+    <div class="page-header">
+        <h1>Users</h1>
+        <div class="header-actions">
+            <input type="text" class="form-control" placeholder="Search users..." @bind="_searchTerm" @bind:event="oninput" />
+            <button class="btn btn-primary" @onclick="OpenAddUserDialog">
+                <i class="fas fa-plus-circle mr-2"></i>Add User
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in _filteredUsers)
+                {
+                    <tr>
+                        <td>@user.Name</td>
+                        <td>@user.Email</td>
+                        <td>@GetRoleBadge(user.Role)</td>
+                        <td>@GetStatusBadge(user.Status)</td>
+                        <td>@user.LastLogin.ToString("g")</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-outline btn-icon dropdown-toggle">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <button class="dropdown-item" @onclick="() => EditUser(user)">
+                                        <i class="fas fa-pencil-alt mr-2"></i> Edit
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ToggleUserStatus(user.Id)">
+                                        @(user.Status == "active" ? "Deactivate" : "Activate")
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => DeleteUser(user.Id)">
+                                        <i class="fas fa-trash mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (_showAddUserDialog)
+    {
+        <div class="dialog-overlay" @onclick="CloseAddUserDialog">
+            <div class="dialog" @onclick:stopPropagation="true">
+                <div class="dialog-header">
+                    <h2>Add New User</h2>
+                    <button class="dialog-close" @onclick="CloseAddUserDialog">×</button>
+                </div>
+                <div class="dialog-content">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" @bind="_newUser.Name" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" @bind="_newUser.Email" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select class="form-control" @bind="_newUser.Role">
+                            <option value="customer">Customer</option>
+                            <option value="staff">Staff</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="dialog-footer">
+                    <button class="btn btn-outline" @onclick="CloseAddUserDialog">Cancel</button>
+                    <button class="btn btn-primary" @onclick="AddUser">Add User</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<UserItem> _users = new List<UserItem>();
+    private List<UserItem> _filteredUsers = new List<UserItem>();
+    private string _searchTerm = "";
+    private bool _showAddUserDialog = false;
+    private UserItem _newUser = new UserItem();
+
+    protected override void OnInitialized()
+    {
+        // Initialize with sample data
+        _users = new List<UserItem>
+        {
+            new UserItem
+            {
+                Id = 1,
+                Name = "John Smith",
+                Email = "john.smith@example.com",
+                Role = "customer",
+                Status = "active",
+                LastLogin = DateTime.Parse("2023-04-15T10:30:00")
+            },
+            new UserItem
+            {
+                Id = 2,
+                Name = "Emily Johnson",
+                Email = "emily.j@example.com",
+                Role = "customer",
+                Status = "active",
+                LastLogin = DateTime.Parse("2023-04-14T14:45:00")
+            },
+            new UserItem
+            {
+                Id = 3,
+                Name = "Michael Brown",
+                Email = "michael.b@example.com",
+                Role = "admin",
+                Status = "active",
+                LastLogin = DateTime.Parse("2023-04-15T09:15:00")
+            },
+            new UserItem
+            {
+                Id = 4,
+                Name = "Sarah Davis",
+                Email = "sarah.d@example.com",
+                Role = "customer",
+                Status = "inactive",
+                LastLogin = DateTime.Parse("2023-03-28T11:20:00")
+            },
+            new UserItem
+            {
+                Id = 5,
+                Name = "Robert Wilson",
+                Email = "robert.w@example.com",
+                Role = "staff",
+                Status = "active",
+                LastLogin = DateTime.Parse("2023-04-15T08:10:00")
+            }
+        };
+
+        _filteredUsers = _users;
+    }
+
+    private void Search()
+    {
+        if (string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            _filteredUsers = _users;
+        }
+        else
+        {
+            _filteredUsers = _users.Where(u =>
+                u.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                u.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+    }
+
+    private void DeleteUser(int id)
+    {
+        var user = _users.FirstOrDefault(u => u.Id == id);
+        if (user != null)
+        {
+            _users.Remove(user);
+            _filteredUsers = _filteredUsers.Where(u => u.Id != id).ToList();
+        }
+    }
+
+    private void ToggleUserStatus(int id)
+    {
+        var user = _users.FirstOrDefault(u => u.Id == id);
+        if (user != null)
+        {
+            user.Status = user.Status == "active" ? "inactive" : "active";
+            // Force UI refresh
+            _filteredUsers = new List<UserItem>(_filteredUsers);
+        }
+    }
+
+    private void EditUser(UserItem user)
+    {
+        // In a real app, you would open an edit dialog here
+        _newUser = user;
+        _showAddUserDialog = true;
+    }
+
+    private void OpenAddUserDialog()
+    {
+        _newUser = new UserItem
+            {
+                Role = "customer",
+                Status = "active"
+            };
+        _showAddUserDialog = true;
+    }
+
+    private void CloseAddUserDialog()
+    {
+        _showAddUserDialog = false;
+    }
+
+    private void AddUser()
+    {
+        if (!string.IsNullOrWhiteSpace(_newUser.Name) && !string.IsNullOrWhiteSpace(_newUser.Email))
+        {
+            int id = _users.Count > 0 ? _users.Max(u => u.Id) + 1 : 1;
+            _newUser.Id = id;
+            _newUser.Status = "active";
+            _newUser.LastLogin = DateTime.Now;
+
+            _users.Add(_newUser);
+            _filteredUsers = new List<UserItem>(_users);
+
+            _showAddUserDialog = false;
+        }
+    }
+
+    private RenderFragment GetStatusBadge(string status)
+    {
+        return builder =>
+        {
+            builder.OpenElement(0, "span");
+
+            switch (status)
+            {
+                case "active":
+                    builder.AddAttribute(1, "class", "badge badge-success");
+                    builder.AddContent(2, "Active");
+                    break;
+                case "inactive":
+                    builder.AddAttribute(1, "class", "badge badge-outline");
+                    builder.AddContent(2, "Inactive");
+                    break;
+                default:
+                    builder.AddAttribute(1, "class", "badge badge-outline");
+                    builder.AddContent(2, "Unknown");
+                    break;
+            }
+
+            builder.CloseElement();
+        };
+    }
+
+    private RenderFragment GetRoleBadge(string role)
+    {
+        return builder =>
+        {
+            builder.OpenElement(0, "span");
+
+            switch (role)
+            {
+                case "admin":
+                    builder.AddAttribute(1, "class", "badge badge-info");
+                    builder.AddContent(2, "Admin");
+                    break;
+                case "staff":
+                    builder.AddAttribute(1, "class", "badge badge-info");
+                    builder.AddContent(2, "Staff");
+                    break;
+                case "customer":
+                    builder.AddAttribute(1, "class", "badge badge-outline");
+                    builder.AddContent(2, "Customer");
+                    break;
+                default:
+                    builder.AddAttribute(1, "class", "badge badge-outline");
+                    builder.AddContent(2, "Unknown");
+                    break;
+            }
+
+            builder.CloseElement();
+        };
+    }
+
+    public class UserItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; }
+        public string Status { get; set; }
+        public DateTime LastLogin { get; set; }
+    }
+}
