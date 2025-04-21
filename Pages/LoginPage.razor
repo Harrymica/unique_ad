@@ -3,6 +3,7 @@
 @inject IAuthService authService
 @inject NavigationManager navMag
 @inject AuthenticationStateProvider AuthProvider
+
 <div id="heading-breadcrumbs">
     <div class="container">
         <div class="row d-flex align-items-center flex-wrap">
@@ -50,7 +51,7 @@
                         </div>
                         <div class="text-center">
 
-                                <button @onclick="LoginUser" type="submit" disabled="@isLoading" style="background-color:#18181b; color:white"
+                                <button type="submit" disabled="@isLoading" style="background-color:#18181b; color:white"
                                         class="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 min-w-32">
                                     @if (isLoading)
                                     {
@@ -77,10 +78,14 @@
 @if (isLoginSuccessfull == true)
 {
     <div class="dialog">
-        <p class="cancel" @onclick="cancelDialog">✖️</p>
+        <p class="cancel" @onclick="cancelDialog">✖
+         
+        </p>
         <div class="diag-content">
 
-        <span class="tick">!</span>
+        <span class="tick">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #FFD43B;"></i>
+        </span>
         <div class="diag-text">
                 <p> @ErrorMsg </p>
         </div>
@@ -104,22 +109,25 @@
         //isLoading = false;
 
 
-       if(response != null)
+        if(response != null && response.session != null)
         {
-            //await Task.Delay(4000);
+           
             isLoading = false;
-            // Simulate login process
-            ErrorMsg = response.Message;
+            
+            await Task.Delay(1000);
+            navMag.NavigateTo("/", forceLoad: true);
             StateHasChanged();
         }
-        ErrorMsg = response.Message;
+        else
+        {
+            
+            ErrorMsg = response.Message;
+            isLoginSuccessfull = true;
+            isLoading = false;
 
-        isLoginSuccessfull = true;
-        isLoading = false;
-
-         await Task.Delay(4000);
-         //isLoginSuccessfull = false;
-        // navMag.NavigateTo("/", forceLoad:true);
+       
+        }
+      
     }
     private async Task cancelDialog()
     {

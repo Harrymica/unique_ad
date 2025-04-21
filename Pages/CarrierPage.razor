@@ -31,7 +31,9 @@
             </div>
             <div class="row">
                 <div class="offset-lg-3 col-lg-6 col-sm-12">
-                    <form enctype="multipart/form-data">
+                        <EditForm Model="@_application" OnValidSubmit="Submit">
+                             <div enctype="multipart/form-data">
+
                         <div class="row">
                             <div class="col-sm-12 col-lg-6 form-group">
                                 <label>First Name *</label>
@@ -89,11 +91,23 @@
 
                        
                         <div class="col-md-12 text-center">
-                            <button type="submit"  class="btn btn-template-outlined" @onclick="Submit">
-                                <i class="fa fa-envelope-o"></i> Submit
+                                <button type="submit" class="btn btn-template-outlined" style="color:#92C3F4; border-color:grey">
+                                <i class="fa fa-envelope-o"></i>
+                                    @if (isLoading)
+                                    {
+                                        <div class="spinner-border spinner-border-sm mr-2" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <span>Submitting...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Submit</span>
+                                    }
                             </button>
                         </div>
-                    </form>
+                    </div>
+                        </EditForm>
                     <br>
                 </div>
             </div>
@@ -101,18 +115,90 @@
     </div>
 </div>
 
+@if (isSubmitSuccessfull == true)
+{
+    <div class="dialog">
+        <p class="cancel" @onclick="cancelDialog">
+            ✖
+
+        </p>
+        <div class="diag-content">
+
+            <span class="tick">
+                @if (isSubmitSuccessfull == true)
+                {
+                    <i class="fa-regular fa-circle-check" style="color: #00cc22;"></i>
+                }
+              
+                
+            </span>
+            <div class="diag-text">
+                <p> @ErrorMsg </p>
+            </div>
+        </div>
+
+    </div>
+
+}
+@if (isNotSubmitSuccessfull == true)
+{
+    <div class="dialog">
+        <p class="cancel" @onclick="cancelDialog">
+            ✖
+
+        </p>
+        <div class="diag-content">
+
+            <span class="tick">
+
+                <i class="fa-solid fa-triangle-exclamation" style="color: #FFD43B;"></i>
+            </span>
+            <div class="diag-text">
+                <p> @ErrorMsg </p>
+            </div>
+        </div>
+
+    </div>
+}
+
 @code{
     private ApplicationModel _application = new ApplicationModel();
     private IBrowserFile? file;
     private long maxSize = 1024 * 1024 * 10;
+    private bool isLoading = false;
+    private bool isSubmitSuccessfull = false;
+    private bool isNotSubmitSuccessfull = false;
+    private string ErrorMsg;
+
+
 
 
     private async Task Submit()
     {
         if (file != null && _application != null)
         {
+            isLoading = true;
+            await Task.Delay(2000);
             _application.CreatedAt = DateTime.Now;
-            await appServ.SubmitApplication(_application, file);
+            var response = await appServ.SubmitApplication(_application, file);
+            if(response != null)
+            {
+                ErrorMsg = "Application Submitted Successfully";
+                isLoading = false;
+                isSubmitSuccessfull = true;
+            }
+            else
+            {
+                ErrorMsg = "Error while submitting Application";
+                isLoading = false;
+                isNotSubmitSuccessfull = true;
+            }
+        }
+        else
+        {
+            ErrorMsg = "Application Fields cannot be null or empty";
+            isLoading = false;
+            isNotSubmitSuccessfull = true;
         }
 
     }
@@ -122,7 +208,11 @@
 
         file = e.File;  
     }
-
+    private async Task cancelDialog()
+    {
+        isSubmitSuccessfull = false;
+        isNotSubmitSuccessfull = false;
+    }
    
 
 }

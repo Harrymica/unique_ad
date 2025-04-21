@@ -2,14 +2,15 @@
 @layout AdminLayout
 @inject IApplicationService appServ
 @inject IJSRuntime jsRuntime
+@inject IToastService toast
 <PageTitle>Applications - Printing Press Admin</PageTitle>
 
 <div class="applications-container">
     <div class="page-header">
-        <h1>Job Applications</h1>
+        <h1 style="text-align:center; text-transform:uppercase; font-weight:800">Job Applications</h1>
         <div class="search-container">
-            <input type="text" class="form-control" placeholder="Search applications..." @bind="_searchTerm" @bind:event="oninput" />
-            <button class="btn btn-outline" @onclick="Search">Search</button>
+            <input type="text" class="form-control" placeholder="Search applications..." @bind-value="_searchTerm"  />
+            <button class="btn btn-outline" @onclick="()=> Search(_searchTerm)">Search</button>
         </div>
     </div>
 
@@ -44,7 +45,7 @@
                                 </button>
                                 <div class="dropdown">
                                     <button class="btn btn-outline btn-icon dropdown-toggle">
-                                        <i class="fas fa-ellipsis-v"></i>
+                                            <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
                                     <div class="dropdown-menu">
                                         <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasInterviewed)">
@@ -126,7 +127,7 @@
 
 @code {
 
-    private string _searchTerm = "";
+    private string _searchTerm;// = "";
     private bool _showViewDialog = false;
     private ApplicationModel _selectedApplication;
     private string MarkasInterviewed = "interview";
@@ -134,26 +135,27 @@
     private string MarkasRejected = "rejected";
 
     private List<ApplicationModel> models = new List<ApplicationModel>();
+    private List<ApplicationModel> _filteredmodels = new List<ApplicationModel>();
     protected override async  Task OnInitializedAsync()
     {
 
         models = await appServ.getApplicationList();
-
+        _filteredmodels = models;
     }
 
-    private void Search()
+    private void Search(string _search)
     {
-        if (string.IsNullOrWhiteSpace(_searchTerm))
+        if (!string.IsNullOrWhiteSpace(_search))
         {
-            // _filteredApplications = _applications;
+            _filteredmodels = models.Where(i => i.FirstName.Contains(_search, StringComparison.OrdinalIgnoreCase)
+                                                                     || i.LastName.Contains(_search, StringComparison.OrdinalIgnoreCase) 
+                                                                     || i.Email.Contains(_search, StringComparison.OrdinalIgnoreCase)).ToList();
         }
         else
         {
-            // _filteredApplications = _applications.Where(a =>
-            //     a.FullName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-            //     a.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-            //     a.Position.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
-            // ).ToList();
+            toast.ShowInfo("Sorry no record found");
+            _filteredmodels = models;
+
         }
     }
 

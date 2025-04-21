@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager navMag
 @inject IAuthService authService
+@implements IDisposable
 <PageTitle>uniquead_App</PageTitle>
 
 <div >
@@ -103,9 +104,12 @@
     private bool showDashboard = false;
     protected override async Task OnInitializedAsync()
     {
+        authService.AuthStateChanged += OnAuthStateChanged;
+        await CheckLoginState();
         var response = await authService.GetCurrentUser();
         if (response != null)
         {
+
             noLogedin = false;
             email = response!.Email;
         }
@@ -149,14 +153,52 @@
     private async Task LogOut()
     {
         var response =  authService.SignOutAsync();
-        if (response!= null)
+        if (response != null)
         {
-            
-        navMag.NavigateTo("/login");
+            noLogedin = true;
+            email = null;
+            showDashboard = false;
+
+            navMag.NavigateTo("/login");
+            await Task.Delay(2000);
+            navMag.NavigateTo("/login");
         }
     }
     private async Task Register()
     {
         navMag.NavigateTo("/register");
     }
+
+
+
+    
+
+    private async Task CheckLoginState()
+    {
+        var response = await authService.GetCurrentUser();
+        if (response != null)
+        {
+            noLogedin = false;
+            email = response.Email;
+        }
+
+        var adminResponse = await authService.GetAdmin();
+        showDashboard = adminResponse?.Email != null;
+        StateHasChanged();
+    }
+
+    private async void OnAuthStateChanged()
+    {
+        await InvokeAsync(async () =>
+        {
+            await CheckLoginState();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        authService.AuthStateChanged -= OnAuthStateChanged;
+    }
+
 }

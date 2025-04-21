@@ -14,6 +14,10 @@ namespace uniquead_App.Services.Auth
         //public Task<Session?> GetSessionAsync();
         public Task<User?> GetCurrentUser();
         Task<RegisterModel?> GetAdmin();
+
+        public event Action? AuthStateChanged;
+        void NotifyAuthStateChanged();
+
         ////public Task SaveSessionAsync(Session session);
     }
 }

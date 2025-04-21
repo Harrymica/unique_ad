@@ -10,7 +10,10 @@ namespace uniquead_App.Services.Auth
     public class AuthService : IAuthService
     {
         private readonly Supabase.Client _supabaseClient;
-       // public User? User => _supabaseClient.Auth.CurrentUser;
+
+        public event Action? AuthStateChanged;
+
+        // public User? User => _supabaseClient.Auth.CurrentUser;
         public AuthService()
         {
             var options = new SupabaseOptions
@@ -30,8 +33,6 @@ namespace uniquead_App.Services.Auth
                 var userId = signUpResponse.User.Id;
                 if(userId != null)
                 {
-                 
-
                     string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.password);
 
                     // Step 2: Insert additional profile data into `profiles` table
@@ -138,8 +139,8 @@ namespace uniquead_App.Services.Auth
             try
             {
                 loginSession.session = await _supabaseClient.Auth.SignIn(login.Email, login.Password);
+                NotifyAuthStateChanged();
 
-               
                 Console.WriteLine("Succesfully login");
               
             }
@@ -169,7 +170,8 @@ namespace uniquead_App.Services.Auth
             try
             {
                 await _supabaseClient.Auth.SignOut();
-                await _supabaseClient.Auth.RetrieveSessionAsync();
+                //await _supabaseClient.Auth.RetrieveSessionAsync();
+                NotifyAuthStateChanged();
 
             }
             catch (Exception ex)
@@ -197,6 +199,13 @@ namespace uniquead_App.Services.Auth
             return admin;
             
         }
-        
+
+
+
+        public void NotifyAuthStateChanged()
+        {
+            AuthStateChanged?.Invoke();
+        }
+
     }
 }

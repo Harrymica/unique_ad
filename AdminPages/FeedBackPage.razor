@@ -84,8 +84,8 @@
 </div>
 
 @code {
-    private List<FeedbackItem> _feedback = new List<FeedbackItem>();
-    private List<FeedbackItem> _filteredFeedback = new List<FeedbackItem>();
+
+    private List<feedBackModel> _filteredFeedback = new List<feedBackModel>();
     private string _searchTerm = "";
     private bool _showReplyDialog = false;
     private feedBackModel _selectedFeedback;
@@ -98,74 +98,19 @@
     protected override async Task OnInitializedAsync()
     {
         // Initialize with sample data
-        _feedback = new List<FeedbackItem>
-        {
-            new FeedbackItem
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "john.doe@example.com",
-                Subject = "Print Quality Issue",
-                Message = "The colors on my brochure print were not as vibrant as expected.",
-                Replied = false
-            },
-            new FeedbackItem
-            {
-                Id = 2,
-                FirstName = "Jane",
-                LastName = "Smith",
-                Email = "jane.smith@example.com",
-                Subject = "Great Service",
-                Message = "I wanted to thank you for the quick turnaround on my business cards.",
-                Replied = true
-            },
-            new FeedbackItem
-            {
-                Id = 3,
-                FirstName = "Michael",
-                LastName = "Johnson",
-                Email = "michael.j@example.com",
-                Subject = "Delivery Question",
-                Message = "I was wondering if you offer expedited shipping for large poster orders?",
-                Replied = false
-            },
-            new FeedbackItem
-            {
-                Id = 4,
-                FirstName = "Sarah",
-                LastName = "Williams",
-                Email = "sarah.w@example.com",
-                Subject = "Custom Order Inquiry",
-                Message = "I need a custom size for my company banners. Is this possible?",
-                Replied = true
-            },
-            new FeedbackItem
-            {
-                Id = 5,
-                FirstName = "Robert",
-                LastName = "Brown",
-                Email = "robert.b@example.com",
-                Subject = "Pricing Question",
-                Message = "Could you provide a quote for 500 tri-fold brochures with glossy finish?",
-                Replied = false
-            }
-        };
-
-        _filteredFeedback = _feedback;
-
         feedbacks = await appServ.getFeedBackList();
+        _filteredFeedback = feedbacks;
     }
 
     private void Search()
     {
         if (string.IsNullOrWhiteSpace(_searchTerm))
         {
-            _filteredFeedback = _feedback;
+            _filteredFeedback = feedbacks;
         }
         else
         {
-            _filteredFeedback = _feedback.Where(f =>
+            _filteredFeedback = feedbacks.Where(f =>
                 f.FirstName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 f.LastName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 f.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
