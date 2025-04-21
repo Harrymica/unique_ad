@@ -14,6 +14,13 @@
     </div>
 
     <div class="card">
+        <div class="card-header p-4 md:p-6">
+            <h2 class="sr-only">Feedback List</h2>
+        </div>
+        <div class="card-content p-0">
+
+        <div class="hidden md:block overflow-auto">
+
         <table class="table">
             <thead>
                 <tr>
@@ -32,12 +39,27 @@
                         <td>@item.FirstName @item.LastName</td>
                         <td>@item.Email</td>
                         <td>@item.Subject</td>
-                        <td class="truncate">@item.Message</td>
+                        <td class="truncate">
+                                    @if (item.Message.Length > 20)
+                                    {
+                                        @($"{item.Message.Substring(0, 50)}...")
+
+                                    }
+                                    else
+                                    {
+                                        @item.Message
+                                        
+                                    }       
+                                     
+                        </td>
                         <td>
                             <input type="checkbox" checked="@item.status" @onchange="e => HandleReplyStatus(item.Id, (bool)e.Value)" />
                         </td>
                         <td>
                             <div class="action-buttons">
+                                        <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => ViewApplication(item)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
                                 <button class="btn btn-outline btn-icon" @onclick="() => OpenReplyDialog(item)">
                                     <i class="fas fa-envelope"></i>
                                 </button>
@@ -50,6 +72,56 @@
                 }
             </tbody>
         </table>
+        </div>
+            <!-- Card layout for small screens -->
+            <div class="md:hidden">
+                @foreach (var item in _filteredFeedback)
+                {
+                    <div class="border-b p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-medium">@item.FirstName @item.LastName</h3>
+                                <p class="text-sm text-muted-foreground">@item.Email</p>
+                            </div>
+                            <div class="flex gap-1 action-buttons">
+                                <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => ViewApplication(item)">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                                <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => OpenReplyDialog(item)">
+                                    <i class="fas fa-envelope h-4 w-4"></i>
+                                </button>
+                                <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => DeleteFeedback(item.Id)">
+                                    <i class="fas fa-trash h-4 w-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <p class="text-sm font-medium">Subject:</p>
+                            <p class="text-sm">@item.Subject</p>
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-sm font-medium">Message:</p>
+                            <p class="text-sm line-clamp-2">
+                                @if (item.Message.Length > 20)
+                                {
+                                    @($"{item.Message.Substring(0, 50)}...")
+
+                                }
+                                else
+                                {
+                                    @item.Message
+
+                                }
+                            </p>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm mr-2">Replied:</span>
+                            <input type="checkbox" checked="@item.status" @onchange="e => HandleReplyStatus(item.Id, (bool)e.Value)" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 
     @if (_showReplyDialog)
@@ -81,6 +153,42 @@
             </div>
         </div>
     }
+
+    @if (_showViewDialog)
+    {
+        <div class="dialog-overlay" @onclick="CloseViewDialog">
+            <div class="dialog" @onclick:stopPropagation="true">
+                <div class="dialog-header">
+                    <h2>Application Details</h2>
+                    <button class="dialog-close" @onclick="CloseViewDialog">×</button>
+                </div>
+                <div class="dialog-content">
+                    @if (_selectedApplication != null)
+                    {
+                        <div class="application-details">
+                            <div class="detail-row">
+                                <div class="detail-label">Name:</div>
+                                <div class="detail-value">@_selectedApplication.FirstName, @_selectedApplication.LastName</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Email:</div>
+                                <div class="detail-value">@_selectedApplication.Email</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Position:</div>
+                                <div class="detail-value">@_selectedApplication.Subject</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Applied:</div>
+                                <div class="detail-value">@_selectedApplication.Message</div>
+                            </div>
+                           
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -90,7 +198,8 @@
     private bool _showReplyDialog = false;
     private feedBackModel _selectedFeedback;
     private string _replyText = "";
-
+    private bool _showViewDialog = false;
+    private feedBackModel _selectedApplication;
 
     private List<feedBackModel> feedbacks = new List<feedBackModel>();
 
@@ -154,7 +263,15 @@
     {
         _showReplyDialog = false;
     }
-
+    private void ViewApplication(feedBackModel model)
+    {
+        _selectedApplication = model;
+        _showViewDialog = true;
+    }
+    private void CloseViewDialog()
+    {
+        _showViewDialog = false;
+    }
     private void SendReply()
     {
         if (_selectedFeedback != null)
@@ -165,14 +282,5 @@
         }
     }
 
-    public class FeedbackItem
-    {
-        public int Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Subject { get; set; }
-        public string Message { get; set; }
-        public bool Replied { get; set; }
-    }
+    
 }

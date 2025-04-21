@@ -15,7 +15,13 @@
     </div>
 
     <div class="card">
-        <table class="table">
+        <div class="card-header p-4 md:p-6">
+            <h2 class="sr-only">Applications List</h2>
+        </div>
+        <div class="card-content p-0">
+            <div class="hidden md:block overflow-auto">
+
+            <table class="table">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -73,6 +79,69 @@
                 }
             </tbody>
         </table>
+            </div>
+
+            <!-- Card layout for small screens -->
+            <div class="md:hidden">
+                @if (models != null && models.Any())
+                {
+                    @foreach (var model in models)
+                    {
+                        <div class="border-b p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="font-medium">@model.FirstName @model.LastName</h3>
+                                    <p class="text-sm text-muted-foreground">@model.Email</p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button class="btn btn-ghost btn-icon" @onclick="() => ViewApplication(model)">
+                                        <i class="fas fa-eye h-4 w-4"></i>
+                                    </button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-ghost btn-icon dropdown-toggle">
+                                            <i class="fa-solid fa-ellipsis-vertical h-4 w-4"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasInterviewed)">
+                                                Mark as Interviewed
+                                            </button>
+                                            <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasHired)">
+                                                Mark as Hired
+                                            </button>
+                                            <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasRejected)">
+                                                Mark as Rejected
+                                            </button>
+                                            <button class="dropdown-item" @onclick="() => DeleteApplication(model)">
+                                                <i class="fas fa-trash mr-2"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mb-2">
+                                <div>
+                                    <p class="text-sm font-medium">Position:</p>
+                                    <p class="text-sm">@model.Position</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Applied:</p>
+                                    <p class="text-sm">@model.CreatedAt</p>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <p class="text-sm font-medium">Status:</p>
+                                <div class="mt-1">@GetStatusBadge(model.status)</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="p-4 text-center">No applications to display</div>
+                }
+            </div>
+
+        </div>
     </div>
 
     @if (_showViewDialog)

@@ -89,3 +89,45 @@
 .table {
     color: var(--text-color);
 }
+
+
+/* Responsive utilities */
+@media (min-width: 640px) {
+    .sm\:w-64 {
+        width: 16rem;
+    }
+
+    .sm\:flex-row {
+        flex-direction: row;
+    }
+
+    .sm\:max-w-\[500px\] {
+        max-width: 500px;
+    }
+}
+
+@media (min-width: 768px) {
+    .md\:block {
+        display: block;
+    }
+
+    .md\:hidden {
+        display: none;
+    }
+
+    .md\:flex-row {
+        flex-direction: row;
+    }
+
+    .md\:items-center {
+        align-items: center;
+    }
+
+    .md\:w-auto {
+        width: auto;
+    }
+
+    .md\:p-6 {
+        padding: 1.5rem;
+    }
+}

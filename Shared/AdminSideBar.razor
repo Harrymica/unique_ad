@@ -9,9 +9,11 @@
                 <span class="logo-text">Printing Press Admin</span>
             }
         </div>
+
         <button class="sidebar-toggle" @onclick="ToggleSidebar">
             <i class="fas fa-bars"></i>
         </button>
+
     </div>
 
     <div class="sidebar-content">
@@ -79,6 +81,16 @@
     </div>
 
     <div class="sidebar-footer">
+         <div class="sidebar-item" href="/" id="dHome" style="display:flex; gap:10px; justify-content:center; align-items:center">
+             @if (Expanded == false)
+        {
+            <button class="sidebar-toggle" @onclick="ToggleSidebar">
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+        }
+             
+         </div>
         <NavLink class="sidebar-item" href="/" id="dHome" style="display:flex; gap:10px; justify-content:center; align-items:center">
             <i class="fas fa-home"></i>
 
@@ -86,7 +98,9 @@
             {
                 <span>Home</span>
             }
+
         </NavLink>
+
     </div>
 </div>
 

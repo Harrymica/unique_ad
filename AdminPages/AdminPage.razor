@@ -1,11 +1,14 @@
 ﻿@page "/dashboard"
 @layout AdminLayout
+@using System
+@using System.Collections.Generic
+
 <PageTitle>Dashboard - Printing Press Admin</PageTitle>
 
-<div class="dashboard-container">
-    <h1>Dashboard</h1>
+<div class="container p-4 md:p-6">
+    <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 
-    <div class="grid grid-cols-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="card">
             <div class="card-header">
                 <h3>Total Users</h3>
@@ -54,4 +57,9 @@
 
 @code {
     // Dashboard logic would go here
+    protected override async Task OnInitializedAsync()
+    {
+        // You could fetch data here
+        await base.OnInitializedAsync();
+    }
 }
