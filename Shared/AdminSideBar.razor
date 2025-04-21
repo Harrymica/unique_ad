@@ -19,7 +19,8 @@
         <div class="sidebar-group">
             <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="Navi">
                  @* <NavLink class="sidebar-item" href="/dashboard" Match="NavLinkMatch.All" > *@
-                <i class="fas fa-home"></i>
+                <i class="fas fa-tachometer-alt"></i>
+
                 @if (Expanded)
                 {
                     <span>Dashboard</span>
@@ -78,11 +79,12 @@
     </div>
 
     <div class="sidebar-footer">
-        <NavLink class="sidebar-item" href="/settings">
-            <i class="fas fa-cog"></i>
+        <NavLink class="sidebar-item" href="/">
+            <i class="fas fa-home"></i>
+
             @if (Expanded)
             {
-                <span>Settings</span>
+                <span>Home</span>
             }
         </NavLink>
     </div>
