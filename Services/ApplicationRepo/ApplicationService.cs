@@ -135,8 +135,18 @@ namespace uniquead_App.Services.ApplicationRepo
 
             return remod;
         }
+        public async Task<List<feedBackModel>> DeleteFeedBack(feedBackModel model)
+        {
+            List<feedBackModel> feedBack = new List<feedBackModel>();
+            if (model != null)
+            {
+                var response = await _supabaseClient.From<feedBackModel>().Where(i => i.Id == model.Id).Delete(model);
+                feedBack = response.Models;
+            }
+            return feedBack;
+        }
 
-        public async Task<string> GetFile(string file)
+            public async Task<string> GetFile(string file)
         {
             var bucket =  _supabaseClient.Storage.From("cv-uploads");
             var fileName = Path.GetFileName(new Uri(file).AbsolutePath);

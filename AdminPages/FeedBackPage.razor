@@ -63,7 +63,7 @@
                                 <button class="btn btn-outline btn-icon" @onclick="() => OpenReplyDialog(item)">
                                     <i class="fas fa-envelope"></i>
                                 </button>
-                                <button class="btn btn-outline btn-icon" @onclick="() => DeleteFeedback(item.Id)">
+                                <button class="btn btn-outline btn-icon" @onclick="() => DeleteFeedback(item)">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -90,7 +90,7 @@
                                 <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => OpenReplyDialog(item)">
                                     <i class="fas fa-envelope h-4 w-4"></i>
                                 </button>
-                                <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => DeleteFeedback(item.Id)">
+                                <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => DeleteFeedback(item)">
                                     <i class="fas fa-trash h-4 w-4"></i>
                                 </button>
                             </div>
@@ -229,13 +229,15 @@
         }
     }
 
-    private void DeleteFeedback(Guid id)
+    private void DeleteFeedback(feedBackModel model)
     {
-        var item = feedbacks.FirstOrDefault(f => f.Id == id);
-        if (item != null)
+        var response = appServ.DeleteFeedBack(model);
+ 
+        if (response != null)
         {
-            feedbacks.Remove(item);
-            //_filteredFeedback = _filteredFeedback.Where(f => f.Id != id).ToList();
+            feedbacks.Remove(model);
+            StateHasChanged();    // Tell Blazor to re-render
+
         }
     }
 

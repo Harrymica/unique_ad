@@ -13,6 +13,7 @@ namespace uniquead_App.Services.ApplicationRepo
         Task<feedBackModel> EditFeedBack(feedBackModel model);
 
        Task<ApplicationModel> Deletepplication(ApplicationModel model);
+        Task<List<feedBackModel>> DeleteFeedBack(feedBackModel model);
         Task<string> GetFile(string file);
     }
 }
