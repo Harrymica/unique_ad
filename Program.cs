@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using uniquead_App.Areas.Identity;
 using uniquead_App.Data;
 using uniquead_App.Services.ApplicationRepo;
+using uniquead_App.Services.AppRepo;
 using uniquead_App.Services.Auth;
 using uniquead_App.Services.authState;
 
@@ -32,6 +33,7 @@ namespace uniquead_App
             builder.Services.AddSingleton<WeatherForecastService>();
             builder.Services.AddSingleton<IAuthService, AuthService>();
             builder.Services.AddSingleton<IApplicationService, ApplicationService>();
+            builder.Services.AddSingleton<IAppService, AppService>();
             builder.Services.AddBlazoredToast();
             builder.Services.AddServerSideBlazor()
                     .AddCircuitOptions(options =>

@@ -1,6 +1,6 @@
 ﻿@page "/orders"
 @layout AdminLayout
-
+@inject IAppService appServ
 
 <PageTitle>Orders - Printing Press Admin</PageTitle>
 
@@ -9,7 +9,7 @@
         <h1>Orders</h1>
         <div class="header-actions">
             <input type="text" class="form-control" placeholder="Search orders..." @bind="_searchTerm" @bind:event="oninput" />
-            <button class="btn btn-outline">
+            <button class="btn btn-outline" @onclick="Search">
                 <i class="fas fa-filter mr-2"></i>Filter
             </button>
         </div>
@@ -33,7 +33,7 @@
                 {
                     <tr>
                         <td>@order.Id</td>
-                        <td>@order.Customer</td>
+                        <td>@order.Phone</td>
                         <td>@order.Items</td>
                         <td>$@order.Total.ToString("F2")</td>
                         <td>@order.Date.ToShortDateString()</td>
@@ -42,7 +42,30 @@
                             <button class="btn btn-outline btn-icon" @onclick="() => ViewOrder(order)">
                                 <i class="fas fa-eye"></i>
                             </button>
+                            <div class="dropdown">
+                                <button class="btn btn-outline btn-ghost btn-icon dropdown-toggle">
+                                    <i class="fa-solid fa-ellipsis-vertical h-4 w-4"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(order, Pending)">
+                                        Pending
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(order, processing)">
+                                        Processing
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(order, shipped)">
+                                        Shipped
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(order, completed)">
+                                        Completed
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(order, cancelled)">
+                                        Cancelled
+                                    </button>
+                                </div>
+                            </div>
                         </td>
+                        
                     </tr>
                 }
             </tbody>
@@ -67,7 +90,7 @@
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Customer:</div>
-                                <div class="detail-value">@_selectedOrder.Customer</div>
+                                <div class="detail-value">@_selectedOrder.Phone</div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Items:</div>
@@ -97,61 +120,23 @@
     private List<OrderItem> _orders = new List<OrderItem>();
     private List<OrderItem> _filteredOrders = new List<OrderItem>();
     private string _searchTerm = "";
+    private string Pending = "Pending";
+    private string processing = "processing";
+    private string shipped = "shipped";
+    private string completed = "completed";
+    private string cancelled = "cancelled";
     private bool _showViewDialog = false;
     private OrderItem _selectedOrder;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         // Initialize with sample data
-        _orders = new List<OrderItem>
+       
+        var result = await appServ.GetOrdersAsync();
+        if(result != null)
         {
-            new OrderItem
-            {
-                Id = "ORD-001",
-                Customer = "John Smith",
-                Items = "Business Cards (500)",
-                Total = 49.99m,
-                Status = "completed",
-                Date = DateTime.Parse("2023-04-15")
-            },
-            new OrderItem
-            {
-                Id = "ORD-002",
-                Customer = "Emily Johnson",
-                Items = "Brochures (100)",
-                Total = 129.99m,
-                Status = "processing",
-                Date = DateTime.Parse("2023-04-14")
-            },
-            new OrderItem
-            {
-                Id = "ORD-003",
-                Customer = "Michael Brown",
-                Items = "Posters (10)",
-                Total = 89.99m,
-                Status = "pending",
-                Date = DateTime.Parse("2023-04-15")
-            },
-            new OrderItem
-            {
-                Id = "ORD-004",
-                Customer = "Sarah Davis",
-                Items = "Flyers (1000)",
-                Total = 199.99m,
-                Status = "shipped",
-                Date = DateTime.Parse("2023-04-12")
-            },
-            new OrderItem
-            {
-                Id = "ORD-005",
-                Customer = "Robert Wilson",
-                Items = "Banners (2)",
-                Total = 149.99m,
-                Status = "processing",
-                Date = DateTime.Parse("2023-04-13")
-            }
-        };
-
+            _orders = result;
+        }
         _filteredOrders = _orders;
     }
 
@@ -164,8 +149,8 @@
         else
         {
             _filteredOrders = _orders.Where(o =>
-                o.Id.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                o.Customer.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                // o.Id.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                o.Phone.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 o.Items.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
             ).ToList();
         }
@@ -182,6 +167,12 @@
         _showViewDialog = false;
     }
 
+    private async Task ChangeStatus(OrderItem model, string status)
+    {
+        model.Status = status;
+        var response = await appServ.EditApplication(model);
+    }
+
     private RenderFragment GetStatusBadge(string status)
     {
         return builder =>
@@ -190,7 +181,7 @@
 
             switch (status)
             {
-                case "pending":
+                case "Pending":
                     builder.AddAttribute(1, "class", "badge badge-outline");
                     builder.AddContent(2, "Pending");
                     break;
@@ -220,13 +211,5 @@
         };
     }
 
-    public class OrderItem
-    {
-        public string Id { get; set; }
-        public string Customer { get; set; }
-        public string Items { get; set; }
-        public decimal Total { get; set; }
-        public string Status { get; set; }
-        public DateTime Date { get; set; }
-    }
+    
 }
