@@ -18,68 +18,68 @@
         <div class="card-header p-4 md:p-6">
             <h2 class="sr-only">Applications List</h2>
         </div>
-        <div class="card-content p-0">
-            <div class="hidden md:block overflow-auto">
+       <div class="card-content p-0 ">
+        <div class="hidden md:block overflow-auto">
 
-            <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Position</th>
-                    <th>Applied Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if(models != null)
-                {
-                    
-                @foreach (var model in models)
-                {
+             <table class="table">
+                <thead>
                     <tr>
-                        <td>@model.FirstName @model.LastName</td>
-                        <td>@model.Email</td>
-                        <td>@model.Position</td>
-                        <td>@model.CreatedAt</td>
-                        <td>@GetStatusBadge(model.status)</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-outline btn-icon" @onclick="() => ViewApplication(model)">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <div class="dropdown">
-                                    <button class="btn btn-outline btn-icon dropdown-toggle">
-                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Position</th>
+                        <th>Applied Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(models != null)
+                    {
+                    
+                    @foreach (var model in models)
+                    {
+                        <tr>
+                            <td>@model.FirstName @model.LastName</td>
+                            <td>@model.Email</td>
+                            <td>@model.Position</td>
+                            <td>@model.CreatedAt</td>
+                            <td>@GetStatusBadge(model.status)</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-outline btn-icon" @onclick="() => ViewApplication(model)">
+                                        <i class="fas fa-eye"></i>
                                     </button>
-                                    <div class="dropdown-menu">
-                                        <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasInterviewed)">
-                                            Mark as Interviewed
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline btn-icon dropdown-toggle">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
                                         </button>
-                                        <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasHired)">
-                                            Mark as Hired
-                                        </button>
-                                        <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasRejected)">
-                                            Mark as Rejected
-                                        </button>
-                                        <button class="dropdown-item" @onclick="() => DeleteApplication(model)">
-                                            <i class="fas fa-trash mr-2"></i> Delete
-                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasInterviewed)">
+                                                Mark as Interviewed
+                                            </button>
+                                            <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasHired)">
+                                                Mark as Hired
+                                            </button>
+                                            <button class="dropdown-item" @onclick="() => ChangeStatus(model, MarkasRejected)">
+                                                Mark as Rejected
+                                            </button>
+                                            <button class="dropdown-item" @onclick="() => DeleteApplication(model)">
+                                                <i class="fas fa-trash mr-2"></i> Delete
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                        }
                     }
-                }
-                else
-                {
-                    <p>No application to display</p>
-                }
-            </tbody>
-        </table>
-            </div>
+                    else
+                    {
+                        <p>No application to display</p>
+                    }
+                </tbody>
+             </table>
+       </div>
 
             <!-- Card layout for small screens -->
             <div class="md:hidden">

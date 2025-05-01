@@ -146,7 +146,7 @@ namespace uniquead_App.Services.ApplicationRepo
             return feedBack;
         }
 
-            public async Task<string> GetFile(string file)
+        public async Task<string> GetFile(string file)
         {
             var bucket =  _supabaseClient.Storage.From("cv-uploads");
             var fileName = Path.GetFileName(new Uri(file).AbsolutePath);
@@ -220,6 +220,18 @@ namespace uniquead_App.Services.ApplicationRepo
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 throw;
             }
+        }
+
+        public async Task<List<Users>> GetUsersAsync()
+        {
+            var response = await _supabaseClient.From<Users>().Get();
+
+            if (response.Model == null)
+            {
+                return null;
+            }
+
+            return response.Models;
         }
         
 

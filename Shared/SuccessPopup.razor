@@ -1,0 +1,173 @@
+﻿@page "/success-popup"
+@using System
+@using System.Collections.Generic
+@using System.Timers
+@implements IDisposable
+
+<div class="popup-container @(_isVisible ? "visible" : "")">
+    <div class="popup @(_isVisible ? "popup-visible" : "")">
+        <!-- Close button -->
+        <div class="close-button">
+            <button @onclick="OnClose">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="popup-content">
+            <!-- Success icon -->
+            <div class="success-icon-container">
+                <div class="success-icon-outer">
+                    <div class="success-icon-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="title">Order Successful!</h3>
+            <p class="message">Thank you, @UserName! Your order has been placed.</p>
+
+            <div class="order-info">
+                <p class="order-label">Order Number</p>
+                <p class="order-number">@OrderNumber</p>
+            </div>
+
+            <div class="button-container">
+                <button class="button button-outline" @onclick="OnClose">Close</button>
+                <button class="button button-primary" @onclick="TrackOrder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span>Track Order</span>
+                </button>
+            </div>
+        </div>
+
+        @if (_showConfetti)
+        {
+            <div class="confetti-container">
+                @foreach (var confetti in _confettiItems)
+                {
+                    <div class="confetti-item" style="@confetti.Style"></div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; } = true;
+
+    [Parameter]
+    public string OrderNumber { get; set; } = "ORD-2023-4872";
+
+    [Parameter]
+    public string UserName { get; set; } = "Sarah";
+
+    [Parameter]
+    public EventCallback OnCloseCallback { get; set; }
+
+    private bool _isVisible;
+    private bool _showConfetti;
+    private List<ConfettiItem> _confettiItems = new List<ConfettiItem>();
+    private Timer _confettiTimer;
+    private Random _random = new Random();
+
+    protected override void OnInitialized()
+    {
+        _isVisible = IsOpen;
+        if (_isVisible)
+        {
+            InitializeConfetti();
+            StartConfettiTimer();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        _isVisible = IsOpen;
+        if (_isVisible && !_showConfetti)
+        {
+            InitializeConfetti();
+            StartConfettiTimer();
+        }
+    }
+
+    private void InitializeConfetti()
+    {
+        _confettiItems.Clear();
+        _showConfetti = true;
+
+        string[] colors = new[] {
+            "#FF5252", // red
+            "#FF9800", // orange
+            "#FFEB3B", // yellow
+            "#4CAF50", // green
+            "#2196F3", // blue
+            "#9C27B0", // purple
+            "#EC407A", // pink
+        };
+
+        for (int i = 0; i < 50; i++)
+        {
+            double size = _random.NextDouble() * 8 + 5;
+            double left = _random.NextDouble() * 100;
+            double animationDuration = _random.NextDouble() * 3 + 2;
+            double delay = _random.NextDouble() * 0.5;
+            string color = colors[_random.Next(colors.Length)];
+            string borderRadius = _random.NextDouble() > 0.5 ? "50%" : "0";
+            double rotation = _random.NextDouble() * 360;
+
+            string style = $"width: {size}px; height: {size}px; " +
+                          $"left: {left}%; " +
+                          $"animation-duration: {animationDuration}s; " +
+                          $"animation-delay: {delay}s; " +
+                          $"background-color: {color}; " +
+                          $"border-radius: {borderRadius}; " +
+                          $"transform: rotate({rotation}deg);";
+
+            _confettiItems.Add(new ConfettiItem { Style = style });
+        }
+    }
+
+    private void StartConfettiTimer()
+    {
+        _confettiTimer = new Timer(3000);
+        _confettiTimer.Elapsed += (sender, e) =>
+        {
+            _showConfetti = false;
+            _confettiTimer.Stop();
+            InvokeAsync(StateHasChanged);
+        };
+        _confettiTimer.Start();
+    }
+
+    private async Task OnClose()
+    {
+        _isVisible = false;
+        await OnCloseCallback.InvokeAsync();
+    }
+
+    private void TrackOrder()
+    {
+        // Implement order tracking logic here
+        Console.WriteLine($"Tracking order {OrderNumber}");
+    }
+
+    public void Dispose()
+    {
+        _confettiTimer?.Dispose();
+    }
+
+    private class ConfettiItem
+    {
+        public string Style { get; set; }
+    }
+}

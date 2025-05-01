@@ -15,5 +15,6 @@ namespace uniquead_App.Services.ApplicationRepo
        Task<ApplicationModel> Deletepplication(ApplicationModel model);
         Task<List<feedBackModel>> DeleteFeedBack(feedBackModel model);
         Task<string> GetFile(string file);
+        Task<List<Users>> GetUsersAsync();
     }
 }

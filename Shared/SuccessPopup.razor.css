@@ -1,0 +1,227 @@
+﻿/* Container styles */
+.popup-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+    .popup-container.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+/* Popup styles */
+.popup {
+    position: relative;
+    width: 100%;
+    max-width: 20rem;
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transform: scale(0.8);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+.popup-visible {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Close button */
+.close-button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+}
+
+    .close-button button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem;
+        border-radius: 9999px;
+        color: #9ca3af;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+        .close-button button:hover {
+            color: #4b5563;
+        }
+
+/* Content styles */
+.popup-content {
+    padding: 1.5rem 1rem 1rem;
+    text-align: center;
+}
+
+/* Success icon */
+.success-icon-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.success-icon-outer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(74, 222, 128, 0.2);
+    padding: 0.75rem;
+    border-radius: 9999px;
+}
+
+.success-icon-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #22c55e;
+    padding: 0.75rem;
+    border-radius: 9999px;
+    color: white;
+}
+
+/* Text styles */
+.title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.message {
+    color: #4b5563;
+    margin-bottom: 1rem;
+}
+
+/* Order info */
+.order-info {
+    background-color: #f9fafb;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.order-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.order-number {
+    font-weight: 500;
+    color: #111827;
+}
+
+/* Button styles */
+.button-container {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.button-outline {
+    background-color: transparent;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+    .button-outline:hover {
+        background-color: #f9fafb;
+    }
+
+.button-primary {
+    background-color: #22c55e;
+    border: 1px solid transparent;
+    color: white;
+}
+
+    .button-primary:hover {
+        background-color: #16a34a;
+    }
+
+/* Confetti styles */
+.confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.confetti-item {
+    position: absolute;
+    top: -20px;
+    animation-name: confetti-fall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+@keyframes confetti-fall {
+    to {
+        top: 100%;
+    }
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .popup {
+        background-color: #1f2937;
+    }
+
+    .title {
+        color: white;
+    }
+
+    .message {
+        color: #d1d5db;
+    }
+
+    .order-info {
+        background-color: #111827;
+    }
+
+    .order-label {
+        color: #9ca3af;
+    }
+
+    .order-number {
+        color: white;
+    }
+
+    .button-outline {
+        border-color: #374151;
+        color: #e5e7eb;
+    }
+
+        .button-outline:hover {
+            background-color: #374151;
+        }
+
+    .close-button button:hover {
+        color: #d1d5db;
+    }
+}

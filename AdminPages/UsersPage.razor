@@ -1,5 +1,6 @@
 ﻿@page "/users"
 @layout AdminLayout
+@inject IApplicationService appServ
 
 <PageTitle>Users - Printing Press Admin</PageTitle>
 
@@ -18,23 +19,21 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Last Login</th>
-                    <th>Actions</th>
+                    <th>Id</th>
+                    <th>Username</th>
+                    <th>Phone</th>
+                    <td>Action</td>
+                    
                 </tr>
             </thead>
             <tbody>
                 @foreach (var user in _filteredUsers)
                 {
                     <tr>
-                        <td>@user.Name</td>
-                        <td>@user.Email</td>
-                        <td>@GetRoleBadge(user.Role)</td>
-                        <td>@GetStatusBadge(user.Status)</td>
-                        <td>@user.LastLogin.ToString("g")</td>
+                        <td>@user.Id</td>
+                        <td>@user.username</td>
+                        <td>@user.Phone</td>
+                        
                         <td>
                             <div class="dropdown">
                                 <button class="btn btn-outline btn-icon dropdown-toggle">
@@ -44,10 +43,10 @@
                                     <button class="dropdown-item" @onclick="() => EditUser(user)">
                                         <i class="fas fa-pencil-alt mr-2"></i> Edit
                                     </button>
-                                    <button class="dropdown-item" @onclick="() => ToggleUserStatus(user.Id)">
-                                        @(user.Status == "active" ? "Deactivate" : "Activate")
+                                    <button class="dropdown-item">
+                                       @*  @(user.Status == "active" ? "Deactivate" : "Activate") *@
                                     </button>
-                                    <button class="dropdown-item" @onclick="() => DeleteUser(user.Id)">
+                                    <button class="dropdown-item" @onclick="()=> DeleteUser(user.Id)">
                                         <i class="fas fa-trash mr-2"></i> Delete
                                     </button>
                                 </div>
@@ -70,15 +69,15 @@
                 <div class="dialog-content">
                     <div class="form-group">
                         <label class="form-label">Name</label>
-                        <input type="text" class="form-control" @bind="_newUser.Name" />
+                        <input type="text" class="form-control" @bind="_newUser.username" />
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" @bind="_newUser.Email" />
+                        <label class="form-label">Phone</label>
+                        <input type="email" class="form-control" @bind="_newUser.Phone" />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Role</label>
-                        <select class="form-control" @bind="_newUser.Role">
+                        <select class="form-control">
                             <option value="customer">Customer</option>
                             <option value="staff">Staff</option>
                             <option value="admin">Admin</option>
@@ -95,70 +94,23 @@
 </div>
 
 @code {
-    private List<UserItem> _users = new List<UserItem>();
-    private List<UserItem> _filteredUsers = new List<UserItem>();
+    private List<Users> _users = new List<Users>();
+    private List<Users> _filteredUsers = new List<Users>();
     private string _searchTerm = "";
     private bool _showAddUserDialog = false;
-    private UserItem _newUser = new UserItem();
+    private Users _newUser = new Users();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         // Initialize with sample data
-        _users = new List<UserItem>
-        {
-            new UserItem
-            {
-                Id = 1,
-                Name = "John Smith",
-                Email = "john.smith@example.com",
-                Role = "customer",
-                Status = "active",
-                LastLogin = DateTime.Parse("2023-04-15T10:30:00")
-            },
-            new UserItem
-            {
-                Id = 2,
-                Name = "Emily Johnson",
-                Email = "emily.j@example.com",
-                Role = "customer",
-                Status = "active",
-                LastLogin = DateTime.Parse("2023-04-14T14:45:00")
-            },
-            new UserItem
-            {
-                Id = 3,
-                Name = "Michael Brown",
-                Email = "michael.b@example.com",
-                Role = "admin",
-                Status = "active",
-                LastLogin = DateTime.Parse("2023-04-15T09:15:00")
-            },
-            new UserItem
-            {
-                Id = 4,
-                Name = "Sarah Davis",
-                Email = "sarah.d@example.com",
-                Role = "customer",
-                Status = "inactive",
-                LastLogin = DateTime.Parse("2023-03-28T11:20:00")
-            },
-            new UserItem
-            {
-                Id = 5,
-                Name = "Robert Wilson",
-                Email = "robert.w@example.com",
-                Role = "staff",
-                Status = "active",
-                LastLogin = DateTime.Parse("2023-04-15T08:10:00")
-            }
-        };
+        _users = await appServ.GetUsersAsync();
 
         _filteredUsers = _users;
     }
 
     private void Search()
     {
-        if (string.IsNullOrWhiteSpace(_searchTerm))
+        /*if (string.IsNullOrWhiteSpace(_searchTerm))
         {
             _filteredUsers = _users;
         }
@@ -168,10 +120,10 @@
                 u.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 u.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
             ).ToList();
-        }
+        }*/
     }
 
-    private void DeleteUser(int id)
+    private void DeleteUser(Guid id)
     {
         var user = _users.FirstOrDefault(u => u.Id == id);
         if (user != null)
@@ -181,18 +133,18 @@
         }
     }
 
-    private void ToggleUserStatus(int id)
+    /*private void ToggleUserStatus(Guid id)
     {
         var user = _users.FirstOrDefault(u => u.Id == id);
         if (user != null)
         {
-            user.Status = user.Status == "active" ? "inactive" : "active";
+            user.s = user.Status == "active" ? "inactive" : "active";
             // Force UI refresh
             _filteredUsers = new List<UserItem>(_filteredUsers);
         }
-    }
+    }*/
 
-    private void EditUser(UserItem user)
+    private void EditUser(Users user)
     {
         // In a real app, you would open an edit dialog here
         _newUser = user;
@@ -201,12 +153,12 @@
 
     private void OpenAddUserDialog()
     {
-        _newUser = new UserItem
-            {
-                Role = "customer",
-                Status = "active"
-            };
-        _showAddUserDialog = true;
+        // _newUser = new Users
+        //     {
+        //         Role = "customer",
+        //         Status = "active"
+        //     };
+        // _showAddUserDialog = true;
     }
 
     private void CloseAddUserDialog()
@@ -216,7 +168,7 @@
 
     private void AddUser()
     {
-        if (!string.IsNullOrWhiteSpace(_newUser.Name) && !string.IsNullOrWhiteSpace(_newUser.Email))
+        /*if (!string.IsNullOrWhiteSpace(_newUser.Name) && !string.IsNullOrWhiteSpace(_newUser.Email))
         {
             int id = _users.Count > 0 ? _users.Max(u => u.Id) + 1 : 1;
             _newUser.Id = id;
@@ -227,7 +179,7 @@
             _filteredUsers = new List<UserItem>(_users);
 
             _showAddUserDialog = false;
-        }
+        }*/
     }
 
     private RenderFragment GetStatusBadge(string status)
@@ -286,13 +238,5 @@
         };
     }
 
-    public class UserItem
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Role { get; set; }
-        public string Status { get; set; }
-        public DateTime LastLogin { get; set; }
-    }
+    
 }
