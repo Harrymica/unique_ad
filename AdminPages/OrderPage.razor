@@ -7,7 +7,18 @@
 <div class="orders-container">
     <div class="page-header">
         <h1>Orders</h1>
+
+       
+
         <div class="header-actions">
+            <select class="form-control ml-2" @bind="_selectedStatus" style="max-width:100px">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
             <input type="text" class="form-control" placeholder="Search orders..." @bind="_searchTerm" @bind:event="oninput" />
             <button class="btn btn-outline" @onclick="Search">
                 <i class="fas fa-filter mr-2"></i>Filter
@@ -119,6 +130,20 @@
 
 
 @code {
+    private string _selectedStatusBacking = "";
+    private string _selectedStatus
+    {
+        get => _selectedStatusBacking;
+        set
+        {
+            if (_selectedStatusBacking != value)
+            {
+                _selectedStatusBacking = value;
+                ApplyFilters();
+            }
+        }
+    }
+
     private List<OrderItem> _orders = new List<OrderItem>();
     private List<OrderItem> _filteredOrders = new List<OrderItem>();
     private string _searchTerm = "";
@@ -215,6 +240,30 @@
             builder.CloseElement();
         };
     }
+
+
+    private void FilterByStatus(ChangeEventArgs e)
+    {
+        _selectedStatus = e?.Value?.ToString() ?? "";
+        ApplyFilters();
+    }
+
+    private void SearchFilter()
+    {
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        _filteredOrders = _orders.Where(o =>
+            (string.IsNullOrWhiteSpace(_searchTerm) ||
+             o.Phone.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+             o.Items.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
+            &&
+            (string.IsNullOrWhiteSpace(_selectedStatus) || o.Status == _selectedStatus)
+        ).ToList();
+    }
+
 
     
 }
