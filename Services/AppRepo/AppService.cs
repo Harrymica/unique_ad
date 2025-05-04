@@ -36,5 +36,7 @@ namespace uniquead_App.Services.AppRepo
             var response = await _supabaseClient.From<OrderItem>().Where(i => i.Id == model.Id).Update(model);
             return response.Model;
         }
+
+        
     }
 }

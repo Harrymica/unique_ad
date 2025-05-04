@@ -1,7 +1,7 @@
 ﻿@page "/orders"
 @layout AdminLayout
 @inject IAppService appServ
-
+@inject IApplicationService weAppServ
 <PageTitle>Orders - Printing Press Admin</PageTitle>
 
 <div class="orders-container">
@@ -32,6 +32,7 @@
                 <tr>
                     <th>Order ID</th>
                     <th>Customer</th>
+                    <th>userName</th>
                     <th>Items</th>
                     <th>Total</th>
                     <th>Date</th>
@@ -45,6 +46,11 @@
                     <tr>
                         <td>@order.Id</td>
                         <td>@order.Phone</td>
+                        @foreach (var user in _users.Where(i => i.Id == order.userId))
+                        {
+                            
+                        <td>@user.username</td>  
+                        }
                         <td>@order.Items</td>
                         <td>$@order.Total.ToString("F2")</td>
                         <td>@order.Date.ToShortDateString()</td>
@@ -154,15 +160,21 @@
     private string cancelled = "cancelled";
     private bool _showViewDialog = false;
     private OrderItem _selectedOrder;
+    private List<Users> _users = new List<Users>();
 
 
-    
+
 
     protected override async Task OnInitializedAsync()
     {
         // Initialize with sample data
-       
+
         var result = await appServ.GetOrdersAsync();
+        var users = await weAppServ.GetUsersAsync();
+        if(users != null)
+        {
+            _users = users;
+        }
         if(result != null)
         {
             _orders = result;
