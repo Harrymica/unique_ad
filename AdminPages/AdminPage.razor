@@ -2,6 +2,8 @@
 @layout AdminLayout
 @using System
 @using System.Collections.Generic
+@inject IApplicationService appServ
+@inject IAppService mobileAppServ
 
 <PageTitle>Dashboard - Printing Press Admin</PageTitle>
 
@@ -15,8 +17,12 @@
                 <i class="fas fa-users"></i>
             </div>
             <div class="card-content">
-                <div class="card-value">1,234</div>
-                <div class="card-trend">+12% from last month</div>
+                @if (_users != null)
+                {
+                <div class="card-value">@_users.Count()</div>
+                <div class="card-trend">Mobile App Users</div>
+                    
+                }
             </div>
         </div>
 
@@ -26,8 +32,12 @@
                 <i class="fas fa-print"></i>
             </div>
             <div class="card-content">
-                <div class="card-value">45</div>
-                <div class="card-trend">+5% from last month</div>
+                @if (OrderItems != null)
+                {
+                <div class="card-value">@OrderItems.Count()</div>
+                    <div class="card-trend">@OrderItems.Where(i => i.Status == "Pending").Count() still pending</div>
+                    
+                }
             </div>
         </div>
 
@@ -37,8 +47,13 @@
                 <i class="fas fa-file-alt"></i>
             </div>
             <div class="card-content">
-                <div class="card-value">23</div>
-                <div class="card-trend">+2 new today</div>
+                @if (appModel != null)
+                {
+                    
+                <div class="card-value">@appModel.Count()</div>
+                    <div class="card-trend">@appModel.Where(i => i.status == "pending").Count() pending</div>
+                
+                }
             </div>
         </div>
 
@@ -48,18 +63,30 @@
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="card-content">
-                <div class="card-value">18</div>
-                <div class="card-trend">5 unread messages</div>
+                @if (feedBacks != null)
+                {
+                    <div class="card-value">@feedBacks.Count()</div>
+                    <div class="card-trend">@feedBacks.Where(i => i.status == false).Count() unread messages</div>
+                    
+                }
             </div>
         </div>
     </div>
 </div>
 
 @code {
+    List<ApplicationModel> appModel = new List<ApplicationModel>();
+    List<feedBackModel> feedBacks = new List<feedBackModel>();
+    List<OrderItem> OrderItems = new List<OrderItem>();
+    private List<Users> _users = new List<Users>();
+
     // Dashboard logic would go here
     protected override async Task OnInitializedAsync()
     {
-        // You could fetch data here
-        await base.OnInitializedAsync();
+        appModel = await appServ.getApplicationList();
+        feedBacks = await appServ.getFeedBackList();
+
+        OrderItems = await mobileAppServ.GetOrdersAsync();
+        _users = await appServ.GetUsersAsync();
     }
 }
