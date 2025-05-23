@@ -20,16 +20,35 @@
        
         <div class="sidebar-group">
             <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="Navi">
-                 @* <NavLink class="sidebar-item" href="/dashboard" Match="NavLinkMatch.All" > *@
+               
                 <i class="fas fa-tachometer-alt"></i>
 
                 @if (Expanded)
                 {
                     <span>Dashboard</span>
+                    
+
                 }
-             @* </NavLink> *@
+            
             </div>
            
+        </div>
+        <div class="sidebar-group">
+            <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="NavToCat">
+
+                <i class="fa-solid fa-list"></i>
+
+                @if (Expanded)
+                {
+                    <span>
+                        Categories
+                    </span>
+
+
+                }
+
+            </div>
+
         </div>
         <div class="sidebar-group">
             <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="ToggleWebsiteSection">
@@ -118,6 +137,10 @@
     private async Task Navi()
     {
         navMag.NavigateTo("/dashboard");
+    }
+    private async Task NavToCat()
+    {
+        navMag.NavigateTo("/category");
     }
     private async Task ToggleSidebar()
     {

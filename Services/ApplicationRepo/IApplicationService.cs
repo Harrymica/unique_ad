@@ -16,5 +16,9 @@ namespace uniquead_App.Services.ApplicationRepo
         Task<List<feedBackModel>> DeleteFeedBack(feedBackModel model);
         Task<string> GetFile(string file);
         Task<List<Users>> GetUsersAsync();
+        Task<bool> DeleteCategory(Categories category);
+        Task<Categories> AddCategory(Categories category, IBrowserFile image);
+        Task<Categories> EditCategory(Categories category, IBrowserFile? newImage = null);
+        Task<List<Categories>> GetCategoryList();
     }
 }

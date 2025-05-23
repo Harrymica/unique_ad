@@ -4,9 +4,6 @@ using Supabase;
 using Supabase.Gotrue;
 using System;
 using uniquead_App.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static System.Net.Mime.MediaTypeNames;
-using static uniquead_App.AdminPages.FeedBackPage;
 
 namespace uniquead_App.Services.ApplicationRepo
 {
@@ -233,7 +230,95 @@ namespace uniquead_App.Services.ApplicationRepo
 
             return response.Models;
         }
-        
+
+        public async Task<Categories> AddCategory(Categories category, IBrowserFile image)
+        {
+            if (image != null)
+            {
+                string imageFileName = await UploadFileToCategoryBucket(image);
+                category.ImageUrl = _supabaseClient.Storage.From("category").GetPublicUrl(imageFileName);
+            }
+
+            var response = await _supabaseClient.From<Categories>().Insert(category);
+            return response.Model;
+        }
+
+        public async Task<Categories> EditCategory(Categories category, IBrowserFile? newImage = null)
+        {
+            if (newImage != null)
+            {
+                string newFileName = await UploadFileToCategoryBucket(newImage);
+                category.ImageUrl = _supabaseClient.Storage.From("category").GetPublicUrl(newFileName);
+            }
+
+            var response = await _supabaseClient
+                .From<Categories>()
+                .Where(x => x.Id == category.Id)
+                .Update(category);
+
+            return response.Model;
+        }
+
+        public async Task<bool> DeleteCategory(Categories category)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(category.ImageUrl))
+                {
+                    var relativePath = new Uri(category.ImageUrl).AbsolutePath.Replace("/storage/v1/object/public/category/", "");
+                    await _supabaseClient.Storage.From("category").Remove(new List<string> { relativePath });
+                }
+
+                await _supabaseClient.From<Categories>().Where(x => x.Id == category.Id).Delete(category);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting category: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<string> UploadFileToCategoryBucket(IBrowserFile file)
+        {
+            string bucketName = "category";
+
+            try
+            {
+                string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+
+                using var memoryStream = new MemoryStream();
+                await file.OpenReadStream(maxAllowedSize: 10485760).CopyToAsync(memoryStream);
+                byte[] fileBytes = memoryStream.ToArray();
+
+                var result = await _supabaseClient.Storage
+                    .From(bucketName)
+                    .Upload(fileBytes, fileName);
+
+                if (result == null)
+                    throw new Exception("Upload failed: result is null");
+
+                Console.WriteLine($"Uploaded category image: {fileName}");
+                return fileName;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Upload error: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<Categories>> GetCategoryList()
+        {
+            var response = await _supabaseClient.From<Categories>().Get();
+
+            if (response.Model == null)
+                return new List<Categories>();
+
+            return response.Models;
+        }
+
+
 
     }
 }

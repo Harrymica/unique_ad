@@ -1,0 +1,445 @@
+﻿@page "/category"
+@layout AdminLayout
+@inject IAppService appServ
+@inject IApplicationService weAppServ
+<PageTitle>Orders - Printing Press Admin</PageTitle>
+
+<div class="orders-container">
+    <div class="page-header">
+        <h1>Category</h1>
+        
+        <div class="header-actions">
+            <button class="btn btn-primary" @onclick="OpenAddUserDialog">
+                <i class="fas fa-plus-circle mr-2"></i>Add User
+            </button>
+            <select class="form-control ml-2" @bind="_selectedStatus" style="max-width:100px">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            <input type="text" class="form-control" placeholder="Search orders..." @bind="_searchTerm" @bind:event="oninput" />
+            <button class="btn btn-outline" @onclick="Search">
+                <i class="fas fa-filter mr-2"></i>Filter
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Order ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>isActive</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in _filteredOrders)
+                {
+                    <tr>
+                        <td>
+                            <img src="@i.ImageUrl" class="image-cover"/>
+                        </td>
+                        <td>@i.Id.ToString().Substring(0,6)</td>
+                        <td>@i.Name</td>
+                        <td>@i.Description</td>
+                        <td>@i.IsActive</td>
+                        <td>@i.Date</td>
+                        <td>@GetStatusBadge(i.Status)</td>
+                        <td>
+                            <button class="btn btn-outline btn-icon" @onclick="() => ViewOrder(i)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <div class="dropdown">
+                                <button class="btn btn-outline btn-ghost btn-icon dropdown-toggle">
+                                    <i class="fa-solid fa-ellipsis-vertical h-4 w-4"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(i, Pending)">
+                                        Pending
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(i, processing)">
+                                        Processing
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(i, shipped)">
+                                        Shipped
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(i, completed)">
+                                        Completed
+                                    </button>
+                                    <button class="dropdown-item" @onclick="() => ChangeStatus(i, cancelled)">
+                                        Cancelled
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (_showViewDialog)
+    {
+        <div class="dialog-overlay" @onclick="CloseViewDialog">
+            <div class="dialog" @onclick:stopPropagation="true">
+                <div class="dialog-header">
+                    <h2>Category Field</h2>
+                    <button class="dialog-close" @onclick="CloseViewDialog">×</button>
+                </div>
+                <div class="dialog-content">
+                    @if (_selectedCategory != null)
+                    {
+                        <div class="order-details">
+                          
+                            <div class="detail-row">
+                                <div class="detail-label">Name:</div>
+                                <div class="detail-value">@_selectedCategory.Name</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Descritption:</div>
+                                <div class="detail-value">@_selectedCategory.Description</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">IsActive:</div>
+                                <div class="detail-value">$@_selectedCategory.IsActive</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Image:</div>
+                                <div class="detail-value">
+                                    <input id="image" class="form-control" rows="3" style="background-color:white;" OnChange="HandleFileChange"
+                                               type="file" multiple accept=".png, .jpg, .jpeg, .pdf" />
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Status:</div>
+                                <div class="detail-value">@GetStatusBadge(_selectedCategory.Status)</div>
+                            </div>
+                        </div>
+                    }
+                    else{
+                        <div class="order-details">
+                            <EditForm Model="@newCategory" OnValidSubmit="Submit">
+
+                                <div class="detail-row">
+                                    <div class="detail-label">Name:</div>
+                                    <input @bind-value="newCategory.Name" class="form-control" />
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Descritption:</div>
+                                    <input @bind-value="newCategory.Description" class="form-control" />
+                                </div>
+                                @* <div class="detail-row">
+                                    <div class="detail-label">IsActive:</div>
+                                    <input class="form-control" @bind-value="newCategory.IsActive" />
+                                </div> *@
+                                <div class="detail-row">
+                                    <div class="detail-label">Status:</div>
+                                   @*  <div class="detail-value">@GetStatusBadge(newCategory.Status)</div> *@
+                                    <select class="form-control" @bind="@newCategory.Status" >
+                                        <option disabled="disabled">Select Option</option>
+                                        <option value="AlReady Made">AlReady Made</option>
+                                        <option value="Awaiting Order"> Awaiting Order</option>
+
+                                    </select>
+                                </div>
+
+                                <div class="detail-row">
+                                    <div class="detail-label">Image:</div>
+                                    
+                                        <InputFile id="image" class="form-control" rows="3" style="background-color:white;" OnChange="HandleFileChange"
+                                               type="file" multiple accept=".png, .jpg, .jpeg, .pdf" />
+                                    
+                                </div>
+
+                                <div class="col-md-12 text-center">
+                                    <button type="submit" class="btn btn-template-outlined" style="color:#92C3F4; border-color:grey">
+                                        <i class="fa fa-envelope-o"></i>
+                                        @if (isLoading)
+                                        {
+                                            <div class="spinner-border spinner-border-sm mr-2" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <span>Submitting...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Submit</span>
+                                        }
+                                    </button>
+                                </div>
+                       
+                              </EditForm>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (isSubmitSuccessfull == true)
+{
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100" style="z-index:1000">
+        <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm transform transition-all duration-300 ease-out scale-100">
+            <div class="flex flex-col items-center">
+                
+                    <svg class="w-16 h-16 text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M5 13l4 4L19 7" />
+                    </svg>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Success!</h2>
+                <p class="text-gray-600 text-center mb-4">@ErrorMsg</p>
+               
+                
+
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full"
+                        @onclick="CloseDialog">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+}
+@if (isNotSubmitSuccessfull == true)
+{
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100" style="z-index:1000">
+        <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm transform transition-all duration-300 ease-out scale-100">
+            <div class="flex flex-col items-center">
+                
+                
+                    <svg class="w-16 h-16 text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Submission Failed</h2>
+                <p class="text-gray-600 text-center mb-4">@ErrorMsg</p>
+                
+
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full"
+                        @onclick="CloseDialog">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private string _selectedStatusBacking = "";
+    private string _selectedStatus
+    {
+        get => _selectedStatusBacking;
+        set
+        {
+            if (_selectedStatusBacking != value)
+            {
+                _selectedStatusBacking = value;
+                ApplyFilters();
+            }
+        }
+    }
+    private bool isSubmitSuccessfull = false;
+    private bool isNotSubmitSuccessfull = false;
+    private string ErrorMsg;
+    private bool _showAddUserDialog = false;
+
+    private List<Categories> _orders = new List<Categories>();
+    private List<Categories> _filteredOrders = new List<Categories>();
+    private string _searchTerm = "";
+    private string Pending = "AlReady Made";
+    private string processing = "Awaiting Order";
+    private string shipped = "shipped";
+    private string completed = "completed";
+    private string cancelled = "cancelled";
+    private bool _showViewDialog = false;
+    private Categories _selectedCategory;
+    private Categories newCategory;
+    private List<Users> _users = new List<Users>();
+    private IBrowserFile? file;
+    private bool isLoading = false;
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize with sample data
+
+        var result = await weAppServ.GetCategoryList();
+        var users = await weAppServ.GetUsersAsync();
+        if (users != null)
+        {
+            _users = users;
+        }
+        if (result != null)
+        {
+            _orders = result;
+        }
+        _filteredOrders = _orders;
+
+    }
+
+    private async Task HandleFileChange(InputFileChangeEventArgs e)
+    {
+
+        file = e.File;
+    }
+
+    private async Task Submit()
+    {
+        if (file != null && newCategory != null)
+        {
+            isLoading = true;
+            await Task.Delay(2000);
+            newCategory.Date = DateTime.Now;
+            var response = await weAppServ.AddCategory(newCategory, file);
+            if (response != null)
+            {
+                ErrorMsg = "Application Submitted Successfully";
+                isLoading = false;
+                isSubmitSuccessfull = true;
+            }
+            else
+            {
+                ErrorMsg = "Error while submitting Application";
+                isLoading = false;
+                isNotSubmitSuccessfull = true;
+            }
+        }
+        else
+        {
+            ErrorMsg = "Application Fields cannot be null or empty";
+            isLoading = false;
+            isNotSubmitSuccessfull = true;
+        }
+
+    }
+    private async Task cancelDialog()
+    {
+        isSubmitSuccessfull = false;
+        isNotSubmitSuccessfull = false;
+    }
+    private void Search()
+    {
+        if (string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            _filteredOrders = _orders;
+        }
+        else
+        {
+            _filteredOrders = _orders.Where(o =>
+                // o.Id.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                o.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                o.Description.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+    }
+    private void CloseDialog()
+    {
+        isNotSubmitSuccessfull = false;
+        isSubmitSuccessfull = false;
+    }
+
+    private void ViewOrder(Categories order)
+    {
+        _selectedCategory = order;
+        _showViewDialog = true;
+    }
+
+    private void CloseViewDialog()
+    {
+        _showViewDialog = false;
+    }
+
+    private async Task ChangeStatus(Categories model, string status)
+    {
+        model.Status = status;
+        //var response = await weAppServ.EditCategory(model);
+    }
+
+    private RenderFragment GetStatusBadge(string status)
+    {
+        return builder =>
+        {
+            builder.OpenElement(0, "span");
+
+            switch (status)
+            {
+                case "Pending":
+                    builder.AddAttribute(1, "class", "badge badge-outline");
+                    builder.AddContent(2, "AlReady Made");
+                    break;
+                case "processing":
+                    builder.AddAttribute(1, "class", "badge badge-info");
+                    builder.AddContent(2, "Awaiting Order");
+                    break;
+                case "shipped":
+                    builder.AddAttribute(1, "class", "badge badge-warning");
+                    builder.AddContent(2, "Shipped");
+                    break;
+                case "completed":
+                    builder.AddAttribute(1, "class", "badge badge-success");
+                    builder.AddContent(2, "Completed");
+                    break;
+                case "cancelled":
+                    builder.AddAttribute(1, "class", "badge badge-danger");
+                    builder.AddContent(2, "Cancelled");
+                    break;
+                default:
+                    builder.AddAttribute(1, "class", "badge badge-outline");
+                    builder.AddContent(2, "Unknown");
+                    break;
+            }
+
+            builder.CloseElement();
+        };
+    }
+
+    private void OpenAddUserDialog()
+    {
+        newCategory = new Categories
+            {
+                Status = "Pending", // default value if needed
+                IsActive = true,
+                Date = DateTime.Now
+            };
+        _showViewDialog = true;
+    }
+
+    private void FilterByStatus(ChangeEventArgs e)
+    {
+        _selectedStatus = e?.Value?.ToString() ?? "";
+        ApplyFilters();
+    }
+
+    private void SearchFilter()
+    {
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        _filteredOrders = _orders.Where(o =>
+            (string.IsNullOrWhiteSpace(_searchTerm) ||
+             o.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+             o.Description.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
+            &&
+            (string.IsNullOrWhiteSpace(_selectedStatus) || o.Status == _selectedStatus)
+        ).ToList();
+    }
+
+
+
+}
