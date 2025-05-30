@@ -1,4 +1,11 @@
-﻿.orders-container h1 {
+﻿.image-cover {
+    max-height: 60px;
+    max-width: 60px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.orders-container h1 {
     font-size: 1.875rem;
     font-weight: 700;
 }

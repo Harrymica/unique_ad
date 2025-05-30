@@ -170,7 +170,6 @@ namespace uniquead_App.Services.Auth
             try
             {
                 await _supabaseClient.Auth.SignOut();
-                //await _supabaseClient.Auth.RetrieveSessionAsync();
                 NotifyAuthStateChanged();
 
             }
@@ -199,9 +198,6 @@ namespace uniquead_App.Services.Auth
             return admin;
             
         }
-
-
-
         public void NotifyAuthStateChanged()
         {
             AuthStateChanged?.Invoke();

@@ -42,7 +42,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var i in _filteredOrders)
+                @foreach (var i in _filteredCategory)
                 {
                     <tr>
                         <td>
@@ -69,15 +69,13 @@
                                     <button class="dropdown-item" @onclick="() => ChangeStatus(i, processing)">
                                         Processing
                                     </button>
-                                    <button class="dropdown-item" @onclick="() => ChangeStatus(i, shipped)">
-                                        Shipped
+                                    <button class="dropdown-item" @onclick="() => EditCategory(i)">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
                                     </button>
-                                    <button class="dropdown-item" @onclick="() => ChangeStatus(i, completed)">
-                                        Completed
+                                    <button class="dropdown-item" @onclick="() => DeleteCategory(i)">
+                                        <i class="fas fa-trash"></i> Delete
                                     </button>
-                                    <button class="dropdown-item" @onclick="() => ChangeStatus(i, cancelled)">
-                                        Cancelled
-                                    </button>
+                                    
                                 </div>
                             </div>
                         </td>
@@ -111,13 +109,13 @@
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">IsActive:</div>
-                                <div class="detail-value">$@_selectedCategory.IsActive</div>
+                                <div class="detail-value">@_selectedCategory.IsActive</div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Image:</div>
                                 <div class="detail-value">
-                                    <input id="image" class="form-control" rows="3" style="background-color:white;" OnChange="HandleFileChange"
-                                               type="file" multiple accept=".png, .jpg, .jpeg, .pdf" />
+                                    <img src="@_selectedCategory.ImageUrl" class="image-cover" />
+
                                 </div>
                             </div>
                             <div class="detail-row">
@@ -138,13 +136,10 @@
                                     <div class="detail-label">Descritption:</div>
                                     <input @bind-value="newCategory.Description" class="form-control" />
                                 </div>
-                                @* <div class="detail-row">
-                                    <div class="detail-label">IsActive:</div>
-                                    <input class="form-control" @bind-value="newCategory.IsActive" />
-                                </div> *@
+                               
                                 <div class="detail-row">
                                     <div class="detail-label">Status:</div>
-                                   @*  <div class="detail-value">@GetStatusBadge(newCategory.Status)</div> *@
+                                   
                                     <select class="form-control" @bind="@newCategory.Status" >
                                         <option disabled="disabled">Select Option</option>
                                         <option value="AlReady Made">AlReady Made</option>
@@ -255,8 +250,8 @@
     private string ErrorMsg;
     private bool _showAddUserDialog = false;
 
-    private List<Categories> _orders = new List<Categories>();
-    private List<Categories> _filteredOrders = new List<Categories>();
+    private List<Categories> _categories = new List<Categories>();
+    private List<Categories> _filteredCategory = new List<Categories>();
     private string _searchTerm = "";
     private string Pending = "AlReady Made";
     private string processing = "Awaiting Order";
@@ -285,9 +280,9 @@
         }
         if (result != null)
         {
-            _orders = result;
+            _categories = result;
         }
-        _filteredOrders = _orders;
+        _filteredCategory = _categories;
 
     }
 
@@ -335,11 +330,11 @@
     {
         if (string.IsNullOrWhiteSpace(_searchTerm))
         {
-            _filteredOrders = _orders;
+            _filteredCategory = _categories;
         }
         else
         {
-            _filteredOrders = _orders.Where(o =>
+            _filteredCategory = _categories.Where(o =>
                 // o.Id.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 o.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 o.Description.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
@@ -358,6 +353,19 @@
         _showViewDialog = true;
     }
 
+    private void EditCategory(Categories cat)
+    {
+        _selectedCategory = cat;
+        _showViewDialog = true;
+    }
+    private async Task DeleteCategory(Categories cat)
+    {
+        var response = await weAppServ.DeleteCategory(cat);
+        if(response)
+        {
+            _filteredCategory.Remove(cat);
+        }
+    }
     private void CloseViewDialog()
     {
         _showViewDialog = false;
@@ -431,7 +439,7 @@
 
     private void ApplyFilters()
     {
-        _filteredOrders = _orders.Where(o =>
+        _filteredCategory = _categories.Where(o =>
             (string.IsNullOrWhiteSpace(_searchTerm) ||
              o.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
              o.Description.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))

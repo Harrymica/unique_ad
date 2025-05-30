@@ -30,7 +30,8 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Order ID</th>
+                   @*  <th>Order ID</th> *@
+                     <th>Image</th>
                     <th>Customer</th>
                     <th>userName</th>
                     <th>Items</th>
@@ -44,7 +45,9 @@
                 @foreach (var order in _filteredOrders)
                 {
                     <tr>
-                        <td>@order.Id</td>
+                        <td>
+                            <img src="@order.ImageUrl" class="image-cover" />
+                        </td>
                         <td>@order.Phone</td>
                         @foreach (var user in _users.Where(i => i.Id == order.userId))
                         {

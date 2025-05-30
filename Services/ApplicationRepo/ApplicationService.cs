@@ -259,17 +259,129 @@ namespace uniquead_App.Services.ApplicationRepo
             return response.Model;
         }
 
+        /* public async Task<bool> DeleteCategory(Categories category)
+        {
+            try
+            {
+                var imageDeleted = true;
+
+                if (!string.IsNullOrWhiteSpace(category.ImageUrl))
+                {
+                    var relativePath = new Uri(category.ImageUrl).AbsolutePath.Replace("/storage/v1/object/sign/category/", "");
+                    try
+                    {
+                        var response = await _supabaseClient.Storage.From("category").Remove(new List<string> { relativePath });
+                        imageDeleted = response != null;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Image deletion failed: {ex.Message}");
+                        imageDeleted = false;
+                    }
+                }
+
+                if (imageDeleted)
+                {
+                    var result = await _supabaseClient.From<Categories>().Where(x => x.Id == category.Id).Delete(category);
+                    return result != null;
+                }
+                else
+                {
+                    Console.WriteLine("Image was not deleted. Category will not be deleted.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting category: {ex.Message}");
+                return false;
+            }
+        } */
+
+        /*public async Task<bool> DeleteCategory(Categories category)
+        {
+            try
+            {
+                var imageDeleted = true;
+
+                // category.ImageUrl now contains only the file name (e.g., "abc.jpg")
+                if (!string.IsNullOrWhiteSpace(category.ImageUrl))
+                {
+                    try
+                    {
+                        var response = await _supabaseClient.Storage
+                            .From("category")
+                            .Remove(new List<string> { category.ImageUrl });
+
+                        imageDeleted = response != null;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Image deletion failed: {ex.Message}");
+                        imageDeleted = false;
+                    }
+                }
+
+                if (imageDeleted)
+                {
+                    var result = await _supabaseClient
+                        .From<Categories>()
+                        .Where(x => x.Id == category.Id)
+                        .Delete(category);
+
+                    return result != null;
+                }
+                else
+                {
+                    Console.WriteLine("Image was not deleted. Category will not be deleted.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting category: {ex.Message}");
+                return false;
+            }
+        } */
+
+
         public async Task<bool> DeleteCategory(Categories category)
         {
+            var listofCAt = await GetCategoryList();
+            if(listofCAt != null && category != null)
+            {
+
+             var imageUrl = listofCAt.Where(i => i.Id == category.Id).FirstOrDefault().ImageUrl;
+
+            }
             try
             {
                 if (!string.IsNullOrWhiteSpace(category.ImageUrl))
                 {
-                    var relativePath = new Uri(category.ImageUrl).AbsolutePath.Replace("/storage/v1/object/public/category/", "");
-                    await _supabaseClient.Storage.From("category").Remove(new List<string> { relativePath });
+                    var relativePath = new Uri(category.ImageUrl).AbsolutePath
+                        .Replace("/storage/v1/object/public/category/", "")
+                        .Replace("/storage/v1/object/sign/category/", "");
+                    
+                    try
+                    {
+
+                        var response = await _supabaseClient.Storage.From("category").Remove(new List<string> { relativePath });
+                        if (response != null && response.Count > 0)
+                        {
+                            await _supabaseClient.From<Categories>().Where(x => x.Id == category.Id).Delete(category);
+                        }
+                        else
+                        {
+                            Console.WriteLine(response);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
 
-                await _supabaseClient.From<Categories>().Where(x => x.Id == category.Id).Delete(category);
+
                 return true;
             }
             catch (Exception ex)
@@ -285,7 +397,8 @@ namespace uniquead_App.Services.ApplicationRepo
 
             try
             {
-                string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+                //string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+                var imagePath = Path.Combine("category_images", file.Name);
 
                 using var memoryStream = new MemoryStream();
                 await file.OpenReadStream(maxAllowedSize: 10485760).CopyToAsync(memoryStream);
@@ -293,13 +406,13 @@ namespace uniquead_App.Services.ApplicationRepo
 
                 var result = await _supabaseClient.Storage
                     .From(bucketName)
-                    .Upload(fileBytes, fileName);
+                    .Upload(fileBytes, imagePath);
 
                 if (result == null)
                     throw new Exception("Upload failed: result is null");
 
-                Console.WriteLine($"Uploaded category image: {fileName}");
-                return fileName;
+                Console.WriteLine($"Uploaded category image: {imagePath}");
+                return imagePath;
             }
             catch (Exception ex)
             {
@@ -307,6 +420,43 @@ namespace uniquead_App.Services.ApplicationRepo
                 throw;
             }
         }
+
+        /*public async Task<List<Categories>> GetCategoryList()
+        {
+            var response = await _supabaseClient.From<Categories>().Get();
+
+            if (response.Models == null || response.Models.Count == 0)
+                return new List<Categories>();
+
+            var categories = response.Models;
+
+            foreach (var category in categories)
+            {
+                if (!string.IsNullOrWhiteSpace(category.ImageUrl))
+                {
+                    try
+                    {
+                        // Generate a signed URL valid for 1 hour (3600 seconds)
+                        var signedUrlResponse = await _supabaseClient.Storage
+                            .From("category")
+                            .CreateSignedUrl(category.ImageUrl, 3600);
+
+                        if (signedUrlResponse != null)
+                        {
+                            category.ImageUrl = signedUrlResponse;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to generate signed URL: {ex.Message}");
+                        category.ImageUrl = null;
+                    }
+                }
+            }
+
+            return categories;
+        }*/
+
 
         public async Task<List<Categories>> GetCategoryList()
         {

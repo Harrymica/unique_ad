@@ -20,6 +20,10 @@ namespace uniquead_App.Models
         public decimal Total { get; set; }
         [Column("status")]
         public string Status { get; set; }
+        [Column("image_src")]
+        public string ImageUrl { get; set; }
+        [Column("tag")]
+        public string Tag { get; set; }
         [Column("date")]
         public DateTime Date { get; set; }
     }
