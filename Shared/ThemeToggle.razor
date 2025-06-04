@@ -1,5 +1,37 @@
-﻿<div class="theme-toggle">
-    <button class="btn btn-outline btn-icon" @onclick="ToggleTheme">
+﻿@inject IAppService appServ
+<style scoped>
+    #d_btn i{
+        display: flex;
+        gap: 5px;
+        position: relative;
+    }
+    #d_btn span{
+       
+            font-size: 0.94rem;
+            line-height: 0.94rem;
+            position: absolute;
+            top: 0.1rem;
+    }
+
+    #d_btn{
+        margin: 14px;
+       /*  position:relative; */
+    }
+</style>
+
+
+<div class="theme-toggle">
+
+    <button id="d_btn">
+
+        <i class="fa-solid fa-bell"></i>
+        <span class="badge bg-primary badge-number">@orders.Count</span>
+    </button>
+    <button id="d_btn">
+        <i class="fa-regular fa-comment"></i>
+        <span class="badge bg-success badge-number">3</span>
+    </button>
+    <button class="btn btn-outline btn-icon" id="d_btn" @onclick="ToggleTheme">
         @if (_isDarkTheme)
         {
             <i class="fas fa-sun"></i>
@@ -9,13 +41,26 @@
             <i class="fas fa-moon"></i>
         }
     </button>
+   
 </div>
 
 @code {
     private bool _isDarkTheme;
-
+    List<OrderItem> orders = new List<OrderItem>();
     protected override async Task OnInitializedAsync()
     {
+        var getOrders = await appServ.GetOrdersAsync();
+        if(getOrders != null)
+        {
+            var userIdsWithOrders = getOrders
+                .Where(x => x.Status == "Pending")
+                
+                .Distinct()
+                .ToList();
+            orders = userIdsWithOrders;//getOrders.Where(i => i.Date == DateTime.Now.AddDays(-3).Date).ToList();
+        }   
+
+
         // Get the current theme from localStorage if available
         var theme = "dark";//await JSRuntime.InvokeAsync<string>("localStorage.getItem", "theme");
         _isDarkTheme = theme == "dark";

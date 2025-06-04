@@ -21,7 +21,7 @@ namespace uniquead_App.Services.AppRepo
         {
             List<OrderItem> orders = new List<OrderItem>();
 
-            var response = await _supabaseClient.From<OrderItem>().Get();
+            var response = await _supabaseClient.From<OrderItem>().Where(i => i.Status == "Pending").Get();
 
             if(response != null)
             {

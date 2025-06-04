@@ -1,0 +1,288 @@
+﻿@page "/messages"
+@layout AdminLayout
+@inject IApplicationService appServ
+
+<PageTitle>Messages - Printing Press Admin</PageTitle>
+
+<div class="feedback-container">
+    <div class="page-header">
+        <h1>Customer Feedback (App)</h1>
+        <div class="search-container">
+            <input type="text" class="form-control" placeholder="Search feedback..." @bind="_searchTerm" @bind:event="oninput" />
+            <button class="btn btn-outline" @onclick="Search">Search</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header p-4 md:p-6">
+            <h2 class="sr-only">Messages List</h2>
+        </div>
+        <div class="card-content p-0">
+
+            <div class="hidden md:block overflow-auto">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Replied</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in feedbacks)
+                        {
+                            <tr>
+                                <td>@item.FirstName @item.LastName</td>
+                                <td>@item.Email</td>
+                                <td>@item.Subject</td>
+                                <td class="truncate">
+                                    @if (item.Message.Length > 20)
+                                    {
+                                        @($"{item.Message.Substring(0, 50)}...")
+
+                                    }
+                                    else
+                                    {
+                                        @item.Message
+
+                                    }
+
+                                </td>
+                                <td>
+                                    <input type="checkbox" checked="@item.status" @onchange="e => HandleReplyStatus(item.Id, (bool)e.Value)" />
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => ViewApplication(item)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline btn-icon" @onclick="() => OpenReplyDialog(item)">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="btn btn-outline btn-icon" @onclick="() => DeleteFeedback(item)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- Card layout for small screens -->
+            <div class="md:hidden">
+                @foreach (var item in _filteredFeedback)
+                {
+                    <div class="border-b p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-medium">@item.FirstName @item.LastName</h3>
+                                <p class="text-sm text-muted-foreground">@item.Email</p>
+                            </div>
+                            <div class="flex gap-1 action-buttons">
+                                <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => ViewApplication(item)">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                                <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => OpenReplyDialog(item)">
+                                    <i class="fas fa-envelope h-4 w-4"></i>
+                                </button>
+                                <button class="btn btn-ghost btn-icon btn-outline" @onclick="() => DeleteFeedback(item)">
+                                    <i class="fas fa-trash h-4 w-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <p class="text-sm font-medium">Subject:</p>
+                            <p class="text-sm">@item.Subject</p>
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-sm font-medium">Message:</p>
+                            <p class="text-sm line-clamp-2">
+                                @if (item.Message.Length > 20)
+                                {
+                                    @($"{item.Message.Substring(0, 50)}...")
+
+                                }
+                                else
+                                {
+                                    @item.Message
+
+                                }
+                            </p>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm mr-2">Replied:</span>
+                            <input type="checkbox" checked="@item.status" @onchange="e => HandleReplyStatus(item.Id, (bool)e.Value)" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (_showReplyDialog)
+    {
+        <div class="dialog-overlay" @onclick="CloseReplyDialog">
+            <div class="dialog" @onclick:stopPropagation="true">
+                <div class="dialog-header">
+                    <h2>Reply to @_selectedFeedback?.FirstName @_selectedFeedback?.LastName</h2>
+                    <button class="dialog-close" @onclick="CloseReplyDialog">×</button>
+                </div>
+                <div class="dialog-content">
+                    <div class="form-group">
+                        <label class="form-label">To</label>
+                        <input type="text" class="form-control" value="@_selectedFeedback?.Email" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" value="Re: @_selectedFeedback?.Subject" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" rows="5" @bind="_replyText" placeholder="Type your reply here..."></textarea>
+                    </div>
+                </div>
+                <div class="dialog-footer">
+                    <button class="btn btn-outline" @onclick="CloseReplyDialog">Cancel</button>
+                    <button class="btn btn-primary" @onclick="SendReply">Send Reply</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (_showViewDialog)
+    {
+        <div class="dialog-overlay" @onclick="CloseViewDialog">
+            <div class="dialog" @onclick:stopPropagation="true">
+                <div class="dialog-header">
+                    <h2>Application Details</h2>
+                    <button class="dialog-close" @onclick="CloseViewDialog">×</button>
+                </div>
+                <div class="dialog-content">
+                    @if (_selectedApplication != null)
+                    {
+                        <div class="application-details">
+                            <div class="detail-row">
+                                <div class="detail-label">Name:</div>
+                                <div class="detail-value">@_selectedApplication.FirstName, @_selectedApplication.LastName</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Email:</div>
+                                <div class="detail-value">@_selectedApplication.Email</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Position:</div>
+                                <div class="detail-value">@_selectedApplication.Subject</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Applied:</div>
+                                <div class="detail-value">@_selectedApplication.Message</div>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    private List<feedBackModel> _filteredFeedback = new List<feedBackModel>();
+    private string _searchTerm = "";
+    private bool _showReplyDialog = false;
+    private feedBackModel _selectedFeedback;
+    private string _replyText = "";
+    private bool _showViewDialog = false;
+    private feedBackModel _selectedApplication;
+
+    private List<feedBackModel> feedbacks = new List<feedBackModel>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize with sample data
+        feedbacks = await appServ.getFeedBackList();
+        _filteredFeedback = feedbacks;
+    }
+
+    private void Search()
+    {
+        if (string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            _filteredFeedback = feedbacks;
+        }
+        else
+        {
+            _filteredFeedback = feedbacks.Where(f =>
+                f.FirstName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                f.LastName.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                f.Email.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                f.Subject.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                f.Message.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+    }
+
+    private void DeleteFeedback(feedBackModel model)
+    {
+        var response = appServ.DeleteFeedBack(model);
+
+        if (response != null)
+        {
+            feedbacks.Remove(model);
+            StateHasChanged();    // Tell Blazor to re-render
+
+        }
+    }
+
+    private async Task HandleReplyStatus(Guid id, bool status)
+    {
+        var item = feedbacks.FirstOrDefault(f => f.Id == id);
+        // var dFeedBAck = feedbacks.Where(i => i.Id == id).FirstOrDefault();
+        if (item != null)
+        {
+            item.status = status;
+            var response = await appServ.EditFeedBack(item);
+            //dFeedBAck.status = status;
+
+        }
+    }
+
+    private void OpenReplyDialog(feedBackModel feedback)
+    {
+        _selectedFeedback = feedback;
+        _replyText = "";
+        _showReplyDialog = true;
+    }
+
+    private void CloseReplyDialog()
+    {
+        _showReplyDialog = false;
+    }
+    private void ViewApplication(feedBackModel model)
+    {
+        _selectedApplication = model;
+        _showViewDialog = true;
+    }
+    private void CloseViewDialog()
+    {
+        _showViewDialog = false;
+    }
+    private void SendReply()
+    {
+        if (_selectedFeedback != null)
+        {
+            // In a real app, you would send the email here
+            //_selectedFeedback.Replied = true;
+            _showReplyDialog = false;
+        }
+    }
+
+
+}

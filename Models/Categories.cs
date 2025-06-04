@@ -30,5 +30,10 @@ namespace uniquead_App.Models
             [Column("created_at")]
 
             public DateTime Date { get; set; }
+
+            [Column("price_range")]
+
+            public string Price { get; set; }
+
     }
 }

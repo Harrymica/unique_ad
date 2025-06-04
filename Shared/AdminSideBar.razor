@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager navMag
 
-<div class="sidebar-container">
+<div class="sidebar-container" style="outline:none">
     <div class="sidebar-header">
         <div class="logo-container">
             <i class="fa-solid fa-cloud" style="color: #74C0FC;"></i>
@@ -10,7 +10,9 @@
             }
         </div>
 
+
         <button class="sidebar-toggle" @onclick="ToggleSidebar">
+
             <i class="fas fa-bars"></i>
         </button>
 
@@ -70,6 +72,7 @@
                         <i class="fas fa-file-alt"></i>
                         <span>Applications</span>
                     </NavLink>
+                   
                 </div>
             }
         </div>
@@ -90,9 +93,13 @@
                         <i class="fas fa-users"></i>
                         <span>Users</span>
                     </NavLink>
-                    <NavLink class="sidebar-item" href="/orders">
+                    <NavLink class="sidebar-item" href="/usersorder">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Orders</span>
+                    </NavLink>
+                    <NavLink class="sidebar-item" href="/messages">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Messages</span>
                     </NavLink>
                 </div>
             }

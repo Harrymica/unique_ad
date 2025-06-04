@@ -2,15 +2,19 @@
 @layout AdminLayout
 @using System
 @using System.Collections.Generic
+@using System.Globalization
 @inject IApplicationService appServ
 @inject IAppService mobileAppServ
+@inject NavigationManager navMag
 
 <PageTitle>Dashboard - Printing Press Admin</PageTitle>
 
 <div class="container p-4 md:p-6">
+    <div class="first_part">
+
     <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" style="margin-bottom: 20px;">
         <div class="card">
             <div class="card-header">
                 <h3>Total Users</h3>
@@ -72,6 +76,157 @@
             </div>
         </div>
     </div>
+
+        <div class="col-12">
+            <div class="card top-selling overflow-auto">
+
+                <div class="filter">
+                    <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                        <li class="dropdown-header text-start">
+                            <h6>Filter</h6>
+                        </li>
+
+                        <li><a class="dropdown-item" href="#">Today</a></li>
+                        <li><a class="dropdown-item" href="#">This Month</a></li>
+                        <li><a class="dropdown-item" href="#">This Year</a></li>
+                    </ul>
+                </div>
+
+                <div class="card-body pb-0" style="background-color: #fff;">
+                    <h5 class="card-title">Top Selling <span>| Today</span></h5>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Preview</th>
+                                <th scope="col">Product</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Created at</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var i in _filteredCategory)
+                            {
+                            <tr>
+                                <th scope="row"><a href="#"><img src="@i.ImageUrl" alt="" style="max-height:60px; max-width:60px; object-fit:cover"></a></th>
+                                <td><a href="#" class="text-primary fw-bold">@i.Name</a></td>
+                                    <td>PKR @i.Price</td>
+                                <td class="fw-bold">@i.Status</td>
+                                <td>@i.Date</td>
+                            </tr>
+                                
+                            }
+                            
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="second_part">
+        <div class="">
+
+            <div class="activity-card">
+                <div class="card-header">
+                    <div class="header-content">
+                        <h2 class="card-title">Recent Activity</h2>
+                        <span class="today-label">| Today</span>
+                    </div>
+                    <button class="menu-button" @onclick="ToggleMenu">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="19" cy="12" r="1"></circle>
+                            <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="card-content">
+                    @foreach (var activity in DUserActivities)
+                    {
+                        <div class="activity-item">
+                            <div class="time-column">
+                                <span class="time-text">@activity.DaysAgo day(s)</span>
+                            </div>
+                            <div class="dot-column">
+                                <div class="activity-dot @activity.DotClass"></div>
+                            </div>
+                            <div class="content-column">
+                                <p class="activity-text text-decoration-underline" @onclick="()=> ViewOrder(activity.User.Id)" style="cursor:pointer">
+                                    @activity.User.username made an order @activity.DaysAgo days ago
+                                </p>
+                            </div>
+                        </div>
+
+                    }
+                </div>
+            </div>
+
+            <div class="max-w-2xl mx-auto">
+                <div class="shadow-lg border-0 bg-white rounded-lg overflow-hidden">
+                    <!-- Card Header -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-b px-6 py-4">
+                        <div class="flex items-center space-x-2">
+                            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <h2 class="text-xl font-semibold text-gray-900">Received Emails</h2>
+                            <span class="ml-auto bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                @receivedEmails.Count emails
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="p-0">
+                        @if (receivedEmails.Any())
+                        {
+                            <div class="divide-y divide-gray-100">
+                                @foreach (var email in receivedEmails)
+                                {
+                                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors duration-150">
+                                        <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                            <div class="flex-shrink-0">
+                                                <div class="h-2 w-2 bg-blue-500 rounded-full"></div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 truncate">@email.Email</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center space-x-2 text-sm text-gray-500 flex-shrink-0">
+                                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <div class="text-right">
+                                                <div class="font-medium">@FormatDate(email.Date)</div>
+                                                <div class="text-xs">@FormatTime(email.Date)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-12">
+                                <svg class="h-12 w-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                <p class="text-gray-500">No emails received yet</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @code {
@@ -79,14 +234,127 @@
     List<feedBackModel> feedBacks = new List<feedBackModel>();
     List<OrderItem> OrderItems = new List<OrderItem>();
     private List<Users> _users = new List<Users>();
+    private List<Users> DUSers = new List<Users>();
+    private int daysAgo;
+    private List<string> DotClass = new List<string>
+    {
+
+            "dot-green",
+            "dot-red",
+            "dot-blue",
+            "dot-cyan",
+            "dot-yellow",
+            "dot-gray",
+
+
+    }; 
+    private string SelectedDotClass;
+    private List<UserActivity> DUserActivities = new List<UserActivity>();
+    private List<Categories> _categories = new List<Categories>();
+    private List<Categories> _filteredCategory = new List<Categories>();
 
     // Dashboard logic would go here
     protected override async Task OnInitializedAsync()
     {
         appModel = await appServ.getApplicationList();
         feedBacks = await appServ.getFeedBackList();
-
         OrderItems = await mobileAppServ.GetOrdersAsync();
         _users = await appServ.GetUsersAsync();
+
+        var random = new Random();
+
+        if (OrderItems != null)
+        {
+            var userIdsWithOrders = OrderItems
+                .Where(x => x.Status == "Pending")
+                .Select(x => x.userId)
+                .Distinct()
+                .ToList();
+
+            var usersWithOrders = _users
+                .Where(u => userIdsWithOrders.Contains(u.Id))
+                .DistinctBy(u => u.Id)
+                .ToList();
+
+            foreach (var user in usersWithOrders)
+            {
+                var order = OrderItems.FirstOrDefault(x => x.userId == user.Id && x.Status == "Pending");
+
+                if (order != null)
+                {
+                    var days = (int)(DateTime.UtcNow - order.Date).TotalDays;
+                    var dotClass = DotClass[random.Next(DotClass.Count)];
+
+                    DUserActivities.Add(new UserActivity
+                        {
+                            User = user,
+                            DotClass = dotClass,
+                            DaysAgo = days
+                        });
+                }
+            }
+        }
+
+        var result = await appServ.GetCategoryList();
+        if (result != null)
+        {
+            _categories = result;
+        }
+        //_filteredCategory = _categories;
+        if (_categories.Count > 0)
+        {
+            var randomCat = new Random();
+            _filteredCategory = _categories
+                .OrderBy(x => randomCat.Next())
+                .Take(6)
+                .ToList();
+        }
+
     }
+
+    private void ToggleMenu()
+    {
+        // Handle menu toggle logic here
+        Console.WriteLine("Menu toggled");
+    }
+
+    private void ViewOrder(Guid Id)
+    {
+        navMag.NavigateTo($"orders/{Id}");
+    }
+    private string FormatDate(DateTime date)
+    {
+        return date.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture);
+    }
+
+    private string FormatTime(DateTime date)
+    {
+        return date.ToString("hh:mm tt", CultureInfo.InvariantCulture);
+    }
+    public class EmailItem
+    {
+        public int Id { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+    }
+
+    private List<EmailItem> receivedEmails = new List<EmailItem>
+    {
+        new EmailItem { Id = 1, Email = "john.doe@company.com", Date = new DateTime(2024, 1, 15, 10, 30, 0) },
+        new EmailItem { Id = 2, Email = "sarah.wilson@startup.io", Date = new DateTime(2024, 1, 15, 9, 15, 0) },
+        new EmailItem { Id = 3, Email = "support@techcorp.com", Date = new DateTime(2024, 1, 14, 16, 45, 0) },
+        new EmailItem { Id = 4, Email = "marketing@innovate.com", Date = new DateTime(2024, 1, 14, 14, 20, 0) },
+        new EmailItem { Id = 5, Email = "admin@businesshub.net", Date = new DateTime(2024, 1, 14, 11, 30, 0) },
+        new EmailItem { Id = 6, Email = "contact@webdesign.co", Date = new DateTime(2024, 1, 13, 15, 22, 0) },
+        new EmailItem { Id = 7, Email = "info@consulting.org", Date = new DateTime(2024, 1, 13, 9, 45, 0) },
+        new EmailItem { Id = 8, Email = "team@development.io", Date = new DateTime(2024, 1, 12, 14, 18, 0) }
+    };
+
+    public class UserActivity
+    {
+        public Users User { get; set; }
+        public string DotClass { get; set; }
+        public int DaysAgo { get; set; }
+    }
+
 }
