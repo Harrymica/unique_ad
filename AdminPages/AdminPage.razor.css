@@ -29,6 +29,10 @@
         list-style:disc;
     }
 
+.card {
+    background-color: #fff !important;
+    color:#111827 !important;
+}
 .activity {
    
     border-radius: 1px;
