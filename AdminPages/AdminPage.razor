@@ -187,7 +187,7 @@
                         @if (receivedEmails.Any())
                         {
                             <div class="divide-y divide-gray-100">
-                                @foreach (var email in receivedEmails)
+                                @foreach (var email in _filteredFeedback)
                                 {
                                     <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors duration-150">
                                         <div class="flex items-center space-x-3 flex-1 min-w-0">
@@ -252,6 +252,7 @@
     private List<UserActivity> DUserActivities = new List<UserActivity>();
     private List<Categories> _categories = new List<Categories>();
     private List<Categories> _filteredCategory = new List<Categories>();
+    private List<feedBackModel> _filteredFeedback = new List<feedBackModel>();
 
     // Dashboard logic would go here
     protected override async Task OnInitializedAsync()
@@ -310,6 +311,8 @@
                 .ToList();
         }
 
+        var feedbacks = await appServ.getFeedBackList();
+        _filteredFeedback = feedbacks;
     }
 
     private void ToggleMenu()
