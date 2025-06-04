@@ -126,6 +126,8 @@
     private async Task submit()
     {
         _feedBack.status = false;
+        _feedBack.Date = DateTime.Now;
+
         var response = await appSerV.Support_feedBack(_feedBack);
         _showViewDialog = true;
         if (response != null)
