@@ -42,6 +42,7 @@
     padding: 10px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 5px;
     text-transform: uppercase;
     color: #9c9a9a;
