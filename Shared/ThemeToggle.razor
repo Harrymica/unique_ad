@@ -1,4 +1,5 @@
 ﻿@inject IAppService appServ
+@inject IApplicationService IappServ
 <style scoped>
     #d_btn i{
         display: flex;
@@ -29,7 +30,7 @@
     </button>
     <button id="d_btn">
         <i class="fa-regular fa-comment"></i>
-        <span class="badge bg-success badge-number">3</span>
+        <span class="badge bg-success badge-number">@_filteredFeedback.Count</span>
     </button>
     <button class="btn btn-outline btn-icon" id="d_btn" @onclick="ToggleTheme">
         @if (_isDarkTheme)
@@ -47,6 +48,8 @@
 @code {
     private bool _isDarkTheme;
     List<OrderItem> orders = new List<OrderItem>();
+    private List<feedBackModel> _filteredFeedback = new List<feedBackModel>();
+
     protected override async Task OnInitializedAsync()
     {
         var getOrders = await appServ.GetOrdersAsync();
@@ -59,7 +62,8 @@
                 .ToList();
             orders = userIdsWithOrders;//getOrders.Where(i => i.Date == DateTime.Now.AddDays(-3).Date).ToList();
         }   
-
+        var feedbacks = await IappServ.getFeedBackList();
+        _filteredFeedback = feedbacks.Where(i => i.status == false).ToList();
 
         // Get the current theme from localStorage if available
         var theme = "dark";//await JSRuntime.InvokeAsync<string>("localStorage.getItem", "theme");
