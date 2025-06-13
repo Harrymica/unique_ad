@@ -39,7 +39,7 @@
         </button>
         @if (showCommentDropdown)
         {
-            <div class="dropdown-content">
+            <div class="dropdown-content" id="secNot">
                 @if (_filteredFeedback.Count > 0)
                 {
                     @foreach (var fb in _filteredFeedback)
