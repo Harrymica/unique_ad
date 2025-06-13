@@ -1,37 +1,62 @@
 ﻿@inject IAppService appServ
 @inject IApplicationService IappServ
-<style scoped>
-    #d_btn i{
-        display: flex;
-        gap: 5px;
-        position: relative;
-    }
-    #d_btn span{
-       
-            font-size: 0.94rem;
-            line-height: 0.94rem;
-            position: absolute;
-            top: 0.1rem;
-    }
-
-    #d_btn{
-        margin: 14px;
-       /*  position:relative; */
-    }
-</style>
+@inject NavigationManager navMag
 
 
-<div class="theme-toggle">
+<div class="flex items-center relative z-50" id="theme">
+    <!-- Notification Dropdown -->
+    <div class="notification-wrapper">
+        <button class=@($"relative text-xl {(showNotificationDropdown ? "btn-active" : "")}") @onclick="ToggleNotificationDropdown">
+            <i class="fa-solid fa-bell"></i>
+            <span class="badge bg-primary badge-number">@orders.Count</span>
+        </button>
+        @if (showNotificationDropdown)
+        {
+            <div class="dropdown-content">
+                @if (orders.Count > 0)
+                {
+                    @foreach (var order in DUserActivities)
+                    {
+                        <div class="dropdown-item" @onclick="()=> ViewOrder(order.User.Id)">
+                            <strong>The user:</strong> @order.User.username made an order <br />
+                            <small>Date: @order.DaysAgo day(s) ago</small>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="dropdown-item">No new orders</div>
+                }
+            </div>
+        }
+    </div>
 
-    <button id="d_btn">
+    <!-- Comment Dropdown -->
+    <div class="notification-wrapper">
+        <button class=@($"relative text-xl {(showCommentDropdown ? "btn-active" : "")}") @onclick="ToggleCommentDropdown">
+            <i class="fa-regular fa-comment"></i>
+            <span class="badge bg-success badge-number">@_filteredFeedback.Count</span>
+        </button>
+        @if (showCommentDropdown)
+        {
+            <div class="dropdown-content">
+                @if (_filteredFeedback.Count > 0)
+                {
+                    @foreach (var fb in _filteredFeedback)
+                    {
+                        <div class="dropdown-item">
+                            <strong>@fb.FirstName</strong>: @fb.Message
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="dropdown-item">No new feedback</div>
+                }
+            </div>
+        }
+    </div>
 
-        <i class="fa-solid fa-bell"></i>
-        <span class="badge bg-primary badge-number">@orders.Count</span>
-    </button>
-    <button id="d_btn">
-        <i class="fa-regular fa-comment"></i>
-        <span class="badge bg-success badge-number">@_filteredFeedback.Count</span>
-    </button>
     <button class="btn btn-outline btn-icon" id="d_btn" @onclick="ToggleTheme">
         @if (_isDarkTheme)
         {
@@ -42,40 +67,100 @@
             <i class="fas fa-moon"></i>
         }
     </button>
-   
 </div>
+
+
+
 
 @code {
     private bool _isDarkTheme;
+
+    private bool showNotificationDropdown = false;
+    private bool showCommentDropdown = false;
+    private List<Users> _users = new List<Users>();
     List<OrderItem> orders = new List<OrderItem>();
     private List<feedBackModel> _filteredFeedback = new List<feedBackModel>();
+    private List<UserActivity> DUserActivities = new List<UserActivity>();
+    private List<string> DotClass = new List<string>
+    {
 
+            "dot-green",
+            "dot-red",
+            "dot-blue",
+            "dot-cyan",
+            "dot-yellow",
+            "dot-gray",
+
+
+    };
     protected override async Task OnInitializedAsync()
     {
         var getOrders = await appServ.GetOrdersAsync();
-        if(getOrders != null)
+        _users = await IappServ.GetUsersAsync();
+        if (getOrders != null)
+        {
+            orders = getOrders
+                .Where(x => x.Status == "Pending")
+                .Distinct()
+                .ToList();
+        }
+
+        if (getOrders != null)
         {
             var userIdsWithOrders = getOrders
                 .Where(x => x.Status == "Pending")
-                
+                .Select(x => x.userId)
                 .Distinct()
                 .ToList();
-            orders = userIdsWithOrders;//getOrders.Where(i => i.Date == DateTime.Now.AddDays(-3).Date).ToList();
-        }   
+
+            var usersWithOrders = _users
+                .Where(u => userIdsWithOrders.Contains(u.Id))
+                .DistinctBy(u => u.Id)
+                .ToList();
+            var random = new Random();
+            foreach (var user in usersWithOrders)
+            {
+                var order = getOrders.FirstOrDefault(x => x.userId == user.Id && x.Status == "Pending");
+
+                if (order != null)
+                {
+                    var days = (int)(DateTime.UtcNow - order.Date).TotalDays;
+                    var dotClass = DotClass[random.Next(DotClass.Count)];
+
+                    DUserActivities.Add(new UserActivity
+                        {
+                            User = user,
+                            DotClass = dotClass,
+                            DaysAgo = days
+                        });
+                }
+            }
+        }
+
         var feedbacks = await IappServ.getFeedBackList();
         _filteredFeedback = feedbacks.Where(i => i.status == false).ToList();
 
-        // Get the current theme from localStorage if available
-        var theme = "dark";//await JSRuntime.InvokeAsync<string>("localStorage.getItem", "theme");
+        var theme = "dark"; // await JSRuntime.InvokeAsync<string>("localStorage.getItem", "theme");
         _isDarkTheme = theme == "dark";
 
         if (theme == null)
         {
-            // Check for system preference
             var prefersDark = await JSRuntime.InvokeAsync<bool>("window.matchMedia", "(prefers-color-scheme: dark)");
             _isDarkTheme = prefersDark;
             await SetTheme(_isDarkTheme ? "dark" : "light");
         }
+    }
+
+    private void ToggleNotificationDropdown()
+    {
+        showNotificationDropdown = !showNotificationDropdown;
+        showCommentDropdown = false;
+    }
+
+    private void ToggleCommentDropdown()
+    {
+        showCommentDropdown = !showCommentDropdown;
+        showNotificationDropdown = false;
     }
 
     private async Task ToggleTheme()
@@ -89,7 +174,11 @@
         await JSRuntime.InvokeVoidAsync("localStorage.setItem", "theme", theme);
         await JSRuntime.InvokeVoidAsync("document.documentElement.setAttribute", "data-theme", theme);
     }
+    private void ViewOrder(Guid Id)
+    {
+        navMag.NavigateTo($"orders/{Id}");
+    }
 
-    [Inject]
-    private IJSRuntime JSRuntime { get; set; }
+    [Inject] private IJSRuntime JSRuntime { get; set; }
 }
+
