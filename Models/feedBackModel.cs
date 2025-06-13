@@ -20,7 +20,7 @@ namespace uniquead_App.Models
         public string Message { get; set; }
         [Column("status")]
         public bool status { get; set; }
-        [Column("date")]
+        [Column("Date")]
         public DateTime Date { get; set; }
 
     }
