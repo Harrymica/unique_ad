@@ -1,4 +1,6 @@
-﻿.image-cover {
+﻿
+
+.image-cover {
     max-height: 60px;
     max-width: 60px;
     border-radius: 5px;
@@ -144,3 +146,23 @@
     .dropdown-item:hover {
         background-color: var(--badge-background);
     }
+
+@media (max-width: 768px){
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+
+    /* Optional: prevent full-page horizontal scrolling */
+    body {
+        overflow-x: hidden;
+    }
+
+
+    .header-actions select{
+        font-size:0.5rem;
+        width:50px;
+    }
+}

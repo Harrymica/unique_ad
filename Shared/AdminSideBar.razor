@@ -1,110 +1,223 @@
 ﻿@inject NavigationManager navMag
+@inject IJSRuntime JS
 
 <div class="sidebar-container" style="outline:none">
-    <div class="sidebar-header">
-        <div class="logo-container">
-            <i class="fa-solid fa-cloud" style="color: #74C0FC;"></i>
-            @if (Expanded)
-            {
-                <span class="logo-text">Printing Press Admin</span>
-            }
+    @if (!isNowMobileView)
+    {
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <i class="fa-solid fa-cloud" style="color: #74C0FC;" @onclick="ToggleSidebar"></i>
+                @if (Expanded)
+                {
+                    <span class="logo-text">Printing Press Admin</span>
+                }
+            </div>
+            <button class="sidebar-toggle" @onclick="ToggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
+    }
+    else
+    {
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <i class="fa-solid fa-cloud" style="color: #74C0FC;" @onclick="ToggleMobileMenu"></i>
+                @if (Expanded)
+                {
+                    <span class="logo-text">Printing Press Admin</span>
+                }
+            </div>
+            <button class="sidebar-toggle" @onclick="ToggleMobileMenu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    }
 
-
-        <button class="sidebar-toggle" @onclick="ToggleSidebar">
-
-            <i class="fas fa-bars"></i>
-        </button>
-
-    </div>
 
     <div class="sidebar-content">
+        
+            <div class="sidebar-group">
+                <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="Navi">
+
+                    <i class="fas fa-tachometer-alt"></i>
+
+                    @if (Expanded)
+                    {
+                        <span>Dashboard</span>
+
+
+                    }
+
+                </div>
+
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="NavToCat">
+
+                    <i class="fa-solid fa-list"></i>
+
+                    @if (Expanded)
+                    {
+                        <span>
+                            Categories
+                        </span>
+
+
+                    }
+
+                </div>
+
+            </div>
+            <div class="sidebar-group">
+                <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="ToggleWebsiteSection">
+                    <i class="fas fa-globe"></i>
+                    @if (Expanded)
+                    {
+                        <span>Website Management</span>
+                        <i class="fas fa-chevron-down @(_websiteExpanded ? "rotate" : "")"></i>
+                    }
+                </div>
+                @if (_websiteExpanded && Expanded)
+                {
+                    <div class="sidebar-group-content">
+                        <NavLink class="sidebar-item" href="/feedback">
+                            <i class="fas fa-comment"></i>
+                            <span>Feedback</span>
+                        </NavLink>
+                        <NavLink class="sidebar-item" href="/applications">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Applications</span>
+                        </NavLink>
+
+                    </div>
+                }
+            </div>
+
+            <div class="sidebar-group">
+                <div class="sidebar-group-header @(_databaseExpanded ? "expanded" : "")" @onclick="ToggleDatabaseSection">
+                    <i class="fas fa-database"></i>
+                    @if (Expanded)
+                    {
+                        <span>Database Management(App)</span>
+                        <i class="fas fa-chevron-down @(_databaseExpanded ? "rotate" : "")"></i>
+                    }
+                </div>
+                @if (_databaseExpanded && Expanded)
+                {
+                    <div class="sidebar-group-content">
+                        <NavLink class="sidebar-item" href="/users">
+                            <i class="fas fa-users"></i>
+                            <span>Users</span>
+                        </NavLink>
+                        <NavLink class="sidebar-item" href="/usersorder">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Orders</span>
+                        </NavLink>
+                        <NavLink class="sidebar-item" href="/messages">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Messages</span>
+                        </NavLink>
+                    </div>
+                }
+            </div>
+     
        
-        <div class="sidebar-group">
-            <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="Navi">
-               
-                <i class="fas fa-tachometer-alt"></i>
-
-                @if (Expanded)
-                {
-                    <span>Dashboard</span>
-                    
-
-                }
-            
-            </div>
-           
-        </div>
-        <div class="sidebar-group">
-            <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="NavToCat">
-
-                <i class="fa-solid fa-list"></i>
-
-                @if (Expanded)
-                {
-                    <span>
-                        Categories
-                    </span>
-
-
-                }
-
-            </div>
-
-        </div>
-        <div class="sidebar-group">
-            <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="ToggleWebsiteSection">
-                <i class="fas fa-globe"></i>
-                @if (Expanded)
-                {
-                    <span>Website Management</span>
-                    <i class="fas fa-chevron-down @(_websiteExpanded ? "rotate" : "")"></i>
-                }
-            </div>
-            @if (_websiteExpanded && Expanded)
-            {
-                <div class="sidebar-group-content">
-                    <NavLink class="sidebar-item" href="/feedback">
-                        <i class="fas fa-comment"></i>
-                        <span>Feedback</span>
-                    </NavLink>
-                    <NavLink class="sidebar-item" href="/applications">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Applications</span>
-                    </NavLink>
-                   
-                </div>
-            }
-        </div>
-
-        <div class="sidebar-group">
-            <div class="sidebar-group-header @(_databaseExpanded ? "expanded" : "")" @onclick="ToggleDatabaseSection">
-                <i class="fas fa-database"></i>
-                @if (Expanded)
-                {
-                    <span>Database Management(App)</span>
-                    <i class="fas fa-chevron-down @(_databaseExpanded ? "rotate" : "")"></i>
-                }
-            </div>
-            @if (_databaseExpanded && Expanded)
-            {
-                <div class="sidebar-group-content">
-                    <NavLink class="sidebar-item" href="/users">
-                        <i class="fas fa-users"></i>
-                        <span>Users</span>
-                    </NavLink>
-                    <NavLink class="sidebar-item" href="/usersorder">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Orders</span>
-                    </NavLink>
-                    <NavLink class="sidebar-item" href="/messages">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Messages</span>
-                    </NavLink>
-                </div>
-            }
-        </div>
+        
     </div>
+    @if (_isMobileMenuVisible)
+    {
+        
+    <div class="sidebar-content_2">
+        
+            <div class="mobile-dropdown">
+                    <div class="sidebar-group">
+                    <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="Navi">
+
+                        <i class="fas fa-tachometer-alt"></i>
+
+                        @if (Expanded)
+                        {
+                            <span>Dashboard</span>
+
+
+                        }
+
+                    </div>
+
+                </div>
+                    <div class="sidebar-group">
+                    <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="NavToCat">
+
+                        <i class="fa-solid fa-list"></i>
+
+                        @if (Expanded)
+                        {
+                            <span>
+                                Categories
+                            </span>
+
+
+                        }
+
+                    </div>
+
+                </div>
+                    <div class="sidebar-group">
+                    <div class="sidebar-group-header @(_websiteExpanded ? "expanded" : "")" @onclick="ToggleWebsiteSection">
+                        <i class="fas fa-globe"></i>
+                        @if (Expanded)
+                        {
+                            <span>Website Management</span>
+                            <i class="fas fa-chevron-down @(_websiteExpanded ? "rotate" : "")"></i>
+                        }
+                    </div>
+                    @if (_websiteExpanded && Expanded)
+                    {
+                        <div class="sidebar-group-content">
+                            <NavLink class="sidebar-item" href="/feedback">
+                                <i class="fas fa-comment"></i>
+                                <span>Feedback</span>
+                            </NavLink>
+                            <NavLink class="sidebar-item" href="/applications">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Applications</span>
+                            </NavLink>
+
+                        </div>
+                    }
+                </div>
+
+                <div class="sidebar-group">
+                    <div class="sidebar-group-header @(_databaseExpanded ? "expanded" : "")" @onclick="ToggleDatabaseSection">
+                        <i class="fas fa-database"></i>
+                        @if (Expanded)
+                        {
+                            <span>Database Management(App)</span>
+                            <i class="fas fa-chevron-down @(_databaseExpanded ? "rotate" : "")"></i>
+                        }
+                    </div>
+                    @if (_databaseExpanded && Expanded)
+                    {
+                        <div class="sidebar-group-content">
+                            <NavLink class="sidebar-item" href="/users">
+                                <i class="fas fa-users"></i>
+                                <span>Users</span>
+                            </NavLink>
+                            <NavLink class="sidebar-item" href="/usersorder">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Orders</span>
+                            </NavLink>
+                            <NavLink class="sidebar-item" href="/messages">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Messages</span>
+                            </NavLink>
+                        </div>
+                    }
+                </div>
+            </div>
+        
+    </div>
+    }
 
     <div class="sidebar-footer">
          <div class="sidebar-item" href="/" id="dHome" style="display:flex; gap:10px; justify-content:center; align-items:center">
@@ -131,43 +244,54 @@
 </div>
 
 @code {
-    [Parameter]
-    public bool Expanded { get; set; } = true;
-
-    [Parameter]
-    public EventCallback<bool> ExpandedChanged { get; set; }
+    [Parameter] public bool Expanded { get; set; } = true;
+    [Parameter] public EventCallback<bool> ExpandedChanged { get; set; }
 
     private bool _websiteExpanded = true;
     private bool _databaseExpanded = true;
+    private bool _isMobileMenuVisible = false;
+    private bool isNowMobileView = false;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var isMobile = await JS.InvokeAsync<bool>("checkScreenWidth");
+            isNowMobileView = isMobile;
+            await JS.InvokeVoidAsync("registerResizeHandler", DotNetObjectReference.Create(this));
+            StateHasChanged();
+        }
+    }
 
-    private async Task Navi()
+    [JSInvokable]
+    public void UpdateScreenSize(bool isMobile)
     {
-        navMag.NavigateTo("/dashboard");
+        isNowMobileView = isMobile;
+        StateHasChanged();
     }
-    private async Task NavToCat()
-    {
-        navMag.NavigateTo("/category");
-    }
+
     private async Task ToggleSidebar()
     {
         Expanded = !Expanded;
         await ExpandedChanged.InvokeAsync(Expanded);
     }
 
+    private async Task ToggleMobileMenu()
+    {
+        _isMobileMenuVisible = !_isMobileMenuVisible;
+    }
+
+    private async Task Navi() => navMag.NavigateTo("/dashboard");
+    private async Task NavToCat() => navMag.NavigateTo("/category");
     private void ToggleWebsiteSection()
     {
         if (Expanded)
-        {
             _websiteExpanded = !_websiteExpanded;
-        }
     }
-
     private void ToggleDatabaseSection()
     {
         if (Expanded)
-        {
             _databaseExpanded = !_databaseExpanded;
-        }
     }
 }
+

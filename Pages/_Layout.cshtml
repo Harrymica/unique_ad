@@ -32,6 +32,20 @@
         <a class="dismiss">🗙</a>
     </div>
 
+    <script>
+        window.checkScreenWidth = () => {
+            return window.innerWidth <= 768;
+        };
+
+        window.registerResizeHandler = (dotnetObj) => {
+            window.addEventListener('resize', () => {
+                dotnetObj.invokeMethodAsync('UpdateScreenSize', window.innerWidth <= 768);
+            });
+        };
+    </script>
+
+
+
     <script src="counter.js"></script>
     <script>
         window.startCarousel = function () {
