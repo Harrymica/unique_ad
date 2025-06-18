@@ -10,7 +10,7 @@
         
         <div class="header-actions">
             <button class="btn btn-primary" @onclick="OpenAddUserDialog">
-                <i class="fas fa-plus-circle mr-2"></i>Add User
+                <i class="fas fa-plus-circle mr-2"></i>
             </button>
             <select class="form-control ml-2" @bind="_selectedStatus" style="max-width:100px">
                 <option value="">All Statuses</option>
@@ -28,6 +28,7 @@
     </div>
 
     <div class="card">
+        <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
@@ -84,6 +85,8 @@
                 }
             </tbody>
         </table>
+
+        </div>
     </div>
 
     @if (_showViewDialog)

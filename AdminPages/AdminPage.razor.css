@@ -52,6 +52,18 @@
     display: flex !important;
 }
 
+@media (max-width: 768px){
+    .container {
+        flex-direction: column;
+    }
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+
+}
+
 
 
 
