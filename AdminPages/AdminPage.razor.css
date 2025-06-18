@@ -55,6 +55,7 @@
 @media (max-width: 768px){
     .container {
         flex-direction: column;
+        /*margin:0px 10px !important;*/
     }
     .table-responsive {
         overflow-x: auto;
@@ -69,8 +70,8 @@
 
 @media (min-width: 768px) {
     .container {
-        padding-right: 1.5rem;
-        padding-left: 1.5rem;
+        /*padding-right: 1.5rem;
+        padding-left: 1.5rem;*/
         /*display: block;*/
     }
 }

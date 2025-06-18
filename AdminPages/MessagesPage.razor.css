@@ -131,3 +131,29 @@
         padding: 1.5rem;
     }
 }
+
+@media (max-width: 768px) {
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+
+    /* Optional: prevent full-page horizontal scrolling */
+    body {
+        overflow-x: hidden;
+    }
+
+
+    .header-actions select {
+        font-size: 0.5rem;
+        width: 50px;
+    }
+
+    .page-header {
+        display: flex;
+        gap:10px;
+        flex-direction: column;
+    }
+}

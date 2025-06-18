@@ -637,3 +637,20 @@ h1 {
         text-align: left;
     }
 }
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        /*margin:0px 10px !important;*/
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+    }
+    .page-header {
+        display: flex;
+        gap:10px;
+        flex-direction: column;
+    }
+}
